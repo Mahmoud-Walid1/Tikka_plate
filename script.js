@@ -64,19 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(nextSlide, 5000);
     }
 
-    // 4. Scroll Reveal Animation (Faster)
-    if (typeof ScrollReveal !== 'undefined') {
-        const sr = ScrollReveal({
-            origin: 'bottom',
-            distance: '50px',
-            duration: 1000,
-            delay: 100,
-        });
-        sr.reveal('h2');
-        sr.reveal('.menu-item', { interval: 100 });
-        sr.reveal('.contact-details', { origin: 'left' });
-        sr.reveal('.contact-map', { origin: 'right' });
-    }
+
     
     // 5. Dark/Light Theme Toggle
     function setTheme(theme) {
@@ -213,4 +201,5 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
     });
+
 });
