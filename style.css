@@ -26,7 +26,7 @@ body {
     background: linear-gradient(-45deg, #fabd9f, #fef5f1, #a5d6a7, #fdebe1);
     background-size: 400% 400%;
     animation: moveGradient 8s ease infinite alternate;
-    -webkit-tap-highlight-color: transparent; /* يمنع ظهور لون أزرق عند اللمس على الموبايل */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -473,7 +473,6 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     .container {
         padding: 0 15px;
     }
-
     .nav-links {
         position: absolute; right: 0; top: 80px; background-color: #fff; flex-direction: column; align-items: center; width: 100%; transform: translateX(100%); transition: transform 0.5s ease-in, background-color 0.4s ease;
     }
@@ -483,49 +482,54 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     .toggle .line2 { opacity: 0; }
     .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
     
-    /* Font size adjustments for mobile */
     h2 { font-size: 1.8rem; }
-    .hero-content h1 { font-size: 2rem; }
+    .hero-content h1 { font-size: 2.0rem; }
     .hero-content p { font-size: 1rem; }
-    
-    /* Padding and sizing adjustments for mobile */
     .hero-content { padding: 20px; }
+
     #menu { 
-        max-width: 100%;
-        padding: 40px 15px; 
-        margin: 20px 0;
+        max-width: 100%; padding: 40px 15px; margin: 20px 0;
     }
     .filter-btn {
-        padding: 8px 18px;
-        font-size: 0.9rem;
-        margin: 4px;
+        padding: 8px 18px; font-size: 0.9rem; margin: 4px;
     }
     .contact-grid { grid-template-columns: 1fr; }
     .menu-grid { grid-template-columns: 1fr; }
     
-    .menu-item {
-        height: 320px; /* تصغير ارتفاع الكارت */
+    .menu-item { height: 320px; animation: none; /* Disable glow on mobile */ }
+    .menu-item h3 { font-size: 1.4rem; text-align: center; padding-left: 15px; padding-right: 15px; }
+
+    /* New "Tap Hint" animation for mobile */
+    .menu-item::before {
+        content: '👆';
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.5rem;
+        color: white;
+        z-index: 4;
+        text-shadow: 0 0 10px rgba(0,0,0,0.7);
+        pointer-events: none;
+        opacity: 0;
+        animation: tapHint 3s infinite ease-in-out;
+        animation-delay: 1s;
     }
-    .menu-item h3 {
-        font-size: 1.4rem; /* تصغير خط اسم الطبق */
+    .menu-item:hover::before, .menu-item.is-active::before {
+        animation: none;
+        opacity: 0;
     }
 
     .whatsapp-float, .cart-float {
-        width: 55px; /* تصغير حجم الأزرار العائمة */
-        height: 55px;
+        width: 55px; height: 55px;
     }
     .whatsapp-float img { width: 30px; height: 30px; }
     .cart-float { font-size: 1.6rem; }
-
     #cart-counter {
-        width: 22px;
-        height: 22px;
-        font-size: 0.8rem;
+        width: 22px; height: 22px; font-size: 0.8rem;
     }
-
     .modal-content {
-        width: 95%;
-        margin: 20% auto;
+        width: 95%; margin: 20% auto;
     }
 }
 
@@ -539,4 +543,19 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     0% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 0 rgba(200, 90, 43, 0.7); }
     70% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 10px rgba(200, 90, 43, 0); }
     100% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 0 rgba(200, 90, 43, 0); }
+}
+
+@keyframes tapHint {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+    10%, 50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
 }
