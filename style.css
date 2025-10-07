@@ -422,14 +422,14 @@ footer {
 
 /* --- Floating Buttons & Modal --- */
 .whatsapp-float {
-    position: fixed; bottom: 20px; left: 20px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100;
+    position: fixed; bottom: 20px; left: 20px; background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; transition: width 0.3s, height 0.3s;
 }
-.whatsapp-float img { width: 35px; height: 35px; }
+.whatsapp-float img { width: 35px; height: 35px; transition: width 0.3s, height 0.3s; }
 .cart-float {
-    position: fixed; bottom: 20px; right: 20px; background-color: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; cursor: pointer; font-size: 1.8rem; color: white;
+    position: fixed; bottom: 20px; right: 20px; background-color: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; cursor: pointer; font-size: 1.8rem; color: white; transition: width 0.3s, height 0.3s, font-size 0.3s;
 }
 #cart-counter {
-    position: absolute; top: -5px; right: -5px; background-color: red; color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold;
+    position: absolute; top: -5px; right: -5px; background-color: red; color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; transition: all 0.3s;
 }
 .modal {
     display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); animation: fadeIn 0.5s;
@@ -471,7 +471,7 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
 */
 @media (max-width: 768px) {
     .container {
-        padding: 0 15px; /* تقليل المسافة الجانبية للمحتوى */
+        padding: 0 15px;
     }
 
     .nav-links {
@@ -483,28 +483,45 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     .toggle .line2 { opacity: 0; }
     .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
     
-    /* تصغير حجم الخطوط في الموبايل */
-    h2 { font-size: 2rem; }
-    .hero-content h1 { font-size: 2.2rem; }
-    .hero-content p { font-size: 1.1rem; }
+    /* Font size adjustments for mobile */
+    h2 { font-size: 1.8rem; }
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p { font-size: 1rem; }
     
-    /* تعديل المسافات الداخلية في الموبايل */
+    /* Padding and sizing adjustments for mobile */
     .hero-content { padding: 20px; }
     #menu { 
-        max-width: 100%; /* إلغاء العرض الأقصى للمنيو */
+        max-width: 100%;
         padding: 40px 15px; 
         margin: 20px 0;
     }
-    
-    /* تصغير أزرار الفلترة */
     .filter-btn {
         padding: 8px 18px;
         font-size: 0.9rem;
         margin: 4px;
     }
-
     .contact-grid { grid-template-columns: 1fr; }
-    .menu-grid { grid-template-columns: 1fr; } /* عمود واحد فقط للمنيو في الموبايل */
+    .menu-grid { grid-template-columns: 1fr; }
+    
+    .menu-item {
+        height: 320px; /* تصغير ارتفاع الكارت */
+    }
+    .menu-item h3 {
+        font-size: 1.4rem; /* تصغير خط اسم الطبق */
+    }
+
+    .whatsapp-float, .cart-float {
+        width: 55px; /* تصغير حجم الأزرار العائمة */
+        height: 55px;
+    }
+    .whatsapp-float img { width: 30px; height: 30px; }
+    .cart-float { font-size: 1.6rem; }
+
+    #cart-counter {
+        width: 22px;
+        height: 22px;
+        font-size: 0.8rem;
+    }
 
     .modal-content {
         width: 95%;
