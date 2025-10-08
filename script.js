@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const menuItems = document.querySelectorAll('.menu-item');
     const sliderImages = document.querySelectorAll('.slider-img');
-    const themeToggle = document.getElementById('theme-toggle');
+    const themeCheckbox = document.getElementById('theme-checkbox');
     const body = document.body;
     const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
     const cartIcon = document.getElementById('cart-icon');
@@ -198,3 +198,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 });
+
