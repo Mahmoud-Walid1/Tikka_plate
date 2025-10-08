@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const menuItems = document.querySelectorAll('.menu-item');
     const sliderImages = document.querySelectorAll('.slider-img');
-    const themeCheckbox = document.getElementById('theme-checkbox');
+    const themeCheckbox = document.getElementById('theme-checkbox'); // تم التغيير هنا
     const body = document.body;
     const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
     const cartIcon = document.getElementById('cart-icon');
@@ -68,21 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
-            themeCheckbox.checked = true; 
-            themeToggle.textContent = '☀️';
-            localStorage.setItem('theme', 'dark');
+            themeCheckbox.checked = true; // تعديل: تحديث حالة الزر
         } else {
             body.classList.remove('dark-mode');
-            themeCheckbox.checked = false;
-            themeToggle.textContent = '🌙';
-            localStorage.setItem('theme', 'light');
+            themeCheckbox.checked = false; // تعديل: تحديث حالة الزر
         }
+        localStorage.setItem('theme', theme);
     }
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) { setTheme(savedTheme); }
-   themeCheckbox.addEventListener('change', () => {
-    setTheme(themeCheckbox.checked ? 'dark' : 'light');
-});
+    
+    themeCheckbox.addEventListener('change', () => { // تعديل: تغيير الحدث ليعمل مع الزر الجديد
+        setTheme(themeCheckbox.checked ? 'dark' : 'light');
     });
 
     // 5. Interactive Menu for Mobile
@@ -201,6 +198,3 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 });
-
-
-
