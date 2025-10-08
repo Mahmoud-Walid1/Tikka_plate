@@ -301,20 +301,7 @@ input:checked + .slider-v .knob .sun { opacity: 0; transform: translateY(-10px);
 /* --- Other styles that don't need media queries --- */
 .hamburger div { width: 25px; height: 3px; background-color: var(--text-dark); margin: 5px; transition: all 0.3s ease; }
 .menu-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-.menu-item h3 { 
-    position: absolute; 
-    bottom: 0; 
-    left: 0; 
-    right: 0; 
-    padding: 25px 20px 15px; 
-    margin: 0; 
-    color: #fff; 
-    font-size: 1.6rem; 
-    z-index: 3; 
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); 
-    transition: all 0.5s ease; 
-    text-align: center; /* <<<<<<<<<<<<<<<< هذا هو التعديل */
-}
+.menu-item h3 { position: absolute; bottom: 0; left: 0; right: 0; padding: 25px 20px 15px; margin: 0; color: #fff; font-size: 1.6rem; z-index: 3; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); transition: all 0.5s ease; text-align: center; }
 .menu-item .price { position: absolute; top: 15px; left: 15px; background-color: var(--primary-color); color: #fff; padding: 5px 12px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; z-index: 4; transition: all 0.4s ease; }
 .menu-item p { position: absolute; top: 50%; left: 20px; right: 20px; transform: translateY(-50%); color: #fff; z-index: 3; opacity: 0; transition: opacity 0.5s ease; font-size: 0.95rem; min-height: auto; }
 .menu-item::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--primary-color); opacity: 0; transition: opacity 0.5s ease; z-index: 2; }
@@ -345,6 +332,36 @@ footer { background-color: var(--text-dark); color: var(--text-light); text-alig
 .cart-item-controls button { background-color: #ddd; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; margin: 0 10px; }
 .modal-footer { text-align: center; margin-top: 20px; }
 .modal-footer h3 { color: var(--text-dark); margin-bottom: 15px; }
+
+/* --- New Styles for Order Options & Notes --- */
+.order-options, .order-notes {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.order-options h4, .order-notes h4 {
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+.order-options label {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+#order-notes-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: var(--font-main);
+    resize: vertical;
+}
+
+body.dark-mode .order-options h4, body.dark-mode .order-notes h4 { color: var(--text-dark); }
+body.dark-mode .order-options, body.dark-mode .order-notes { border-top-color: #444; }
+body.dark-mode #order-notes-input { background-color: #444; border-color: #666; color: #fff; }
+
 body.dark-mode { --text-dark: #f0f0f0; --text-light: #1a1a1a; background: linear-gradient(60deg, #1a1a1a, #121212, var(--primary-color), #121212); background-size: 400% 400%; animation: moveGradient 10s ease infinite alternate; }
 body.dark-mode .modal-content { background-color: #333; }
 body.dark-mode .modal-footer h3 { color: var(--text-dark); }
