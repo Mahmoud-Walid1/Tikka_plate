@@ -478,7 +478,76 @@ footer {
 .modal-footer h3 { color: var(--text-dark); margin-bottom: 15px; }
 
 /* --- Theme Toggle Button --- */
-#theme-toggle { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin: 0 10px; color: var(--text-dark); transition: color 0.4s ease; }
+/* --- Theme Toggle Slider --- */
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    width: 60px;
+    position: relative;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: .4s;
+    display: flex;
+    align-items: center;
+}
+
+.slider .icon {
+    font-size: 1.2rem;
+    transition: opacity 0.4s;
+}
+
+.slider .moon {
+    position: absolute;
+    left: 32px;
+    opacity: 0;
+}
+.slider .sun {
+    position: absolute;
+    left: 7px;
+    opacity: 1;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--secondary-color);
+}
+input:checked + .slider .moon {
+    opacity: 1;
+}
+input:checked + .slider .sun {
+    opacity: 0;
+}
+
+input:checked + .slider::before {
+    transform: translateX(26px);
+}
 
 /* --- Dark Mode Styles --- */
 body.dark-mode {
@@ -593,4 +662,5 @@ body.dark-mode .header-socials img { filter: invert(100%) brightness(1.5); }
         opacity: 0;
     }
 }
+
 
