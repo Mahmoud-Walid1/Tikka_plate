@@ -120,6 +120,31 @@ nav {
     color: var(--primary-color);
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+}
+
+.header-socials {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+.header-socials a {
+    display: inline-block;
+    margin: 0 8px;
+}
+.header-socials img {
+    height: 24px;
+    width: 24px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.header-socials img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
 .hamburger {
     display: none;
     cursor: pointer;
@@ -396,19 +421,7 @@ nav {
 .contact-details p { margin-bottom: 15px; font-size: 1.1rem; }
 .contact-details a { color: var(--primary-color); text-decoration: none; }
 .contact-details a:hover { text-decoration: underline; }
-.social-links { margin-top: 20px; }
-.social-links a {
-    display: inline-block;
-    background-color: var(--secondary-color);
-    color: #fff;
-    padding: 10px 15px;
-    margin-right: 10px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-.social-links a:hover { background-color: #133a25; }
+
 .contact-map iframe { border-radius: 10px; }
 
 /* --- Footer --- */
@@ -436,22 +449,27 @@ footer {
 }
 @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; position: relative; }
-.close-btn { color: #aaa; position: absolute; left: 25px; top: 10px; font-size: 28px; font-weight: bold; }
+
+/* Close Button FIX */
 .close-btn {
-    color: #aaa;
     position: absolute;
-    left: 15px; /* تعديل بسيط في المكان */
-    top: 15px;
-    font-size: 28px;
-    font-weight: bold;
-    /* الأكواد الجديدة لتكبير منطقة الضغط */
-    width: 40px;
-    height: 40px;
+    left: 10px;
+    top: 10px;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
-    line-height: 1; /* لضمان التوسيط الدقيق */
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10; /* Ensure it's on top */
 }
+.close-btn:hover, .close-btn:focus { color: black; }
+
 #cart-items .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
 .cart-item-details { flex-grow: 1; }
 .cart-item-controls { display: flex; align-items: center; }
@@ -460,7 +478,7 @@ footer {
 .modal-footer h3 { color: var(--text-dark); margin-bottom: 15px; }
 
 /* --- Theme Toggle Button --- */
-#theme-toggle { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 15px; color: var(--text-dark); transition: color 0.4s ease; }
+#theme-toggle { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin: 0 10px; color: var(--text-dark); transition: color 0.4s ease; }
 
 /* --- Dark Mode Styles --- */
 body.dark-mode {
@@ -477,6 +495,8 @@ body.dark-mode .nav-links { background-color: #2a2a2a; }
 body.dark-mode #theme-toggle { color: var(--text-dark); }
 body.dark-mode .filter-btn.active { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; }
 body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD; }
+body.dark-mode .header-socials img { filter: invert(100%) brightness(1.5); }
+
 
 /*
 ============================================
@@ -496,6 +516,8 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     .toggle .line2 { opacity: 0; }
     .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
     
+    .header-socials { display: none; }
+
     h2 { font-size: 1.8rem; }
     .hero-content h1 { font-size: 2.0rem; }
     .hero-content p { font-size: 1rem; }
@@ -510,10 +532,9 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
     .contact-grid { grid-template-columns: 1fr; }
     .menu-grid { grid-template-columns: 1fr; }
     
-    .menu-item { height: 320px; animation: none; /* Disable glow on mobile */ }
+    .menu-item { height: 320px; animation: none; }
     .menu-item h3 { font-size: 1.4rem; text-align: center; padding-left: 15px; padding-right: 15px; }
 
-    /* New "Tap Hint" animation for mobile */
     .menu-item::before {
         content: '👆';
         position: absolute;
@@ -573,4 +594,3 @@ body.dark-mode .hero-content h1, body.dark-mode .hero-content p { color: #FDFDFD
         opacity: 0;
     }
 }
-
