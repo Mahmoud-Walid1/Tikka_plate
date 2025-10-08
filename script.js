@@ -63,10 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         setInterval(nextSlide, 5000);
     }
-
-
     
-    // 5. Dark/Light Theme Toggle
+    // 4. Dark/Light Theme Toggle
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
@@ -84,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTheme(body.classList.contains('dark-mode') ? 'light' : 'dark');
     });
 
-    // 6. Interactive Menu for Mobile
+    // 5. Interactive Menu for Mobile
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
             const isActive = item.classList.contains('is-active');
@@ -93,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 7. Shopping Cart Logic
+    // 6. Shopping Cart Logic
     function updateCart() {
         cartItemsContainer.innerHTML = '';
         if (cart.length === 0) {
@@ -178,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // The final, formatted invoice string
         let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
         invoice += `-----------------------------------\n`;
         invoice += `*الطلبات:*\n`;
@@ -192,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const restaurantNumber = '966554242136';
         const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
         
-        // The new, more reliable method for opening the link
         const link = document.createElement('a');
         link.href = whatsappUrl;
         link.target = '_blank';
@@ -201,5 +197,4 @@ document.addEventListener('DOMContentLoaded', () => {
         link.click();
         document.body.removeChild(link);
     });
-
 });
