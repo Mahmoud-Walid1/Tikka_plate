@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Selectors ---
     const hamburger = document.querySelector('.hamburger');
-    // تعديل: استهداف الروابط في مكانها الجديد
-    const navLinks = document.querySelector('.nav-left .nav-links'); 
+    const navLinks = document.querySelector('.nav-left .nav-links');
     const filterBtns = document.querySelectorAll('.filter-btn');
     const menuItems = document.querySelectorAll('.menu-item');
     const sliderImages = document.querySelectorAll('.slider-img');
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ... باقي الملف كما هو بدون تغيير ...
     // 2. Menu Filtering
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
