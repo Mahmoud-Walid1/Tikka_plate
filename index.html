@@ -16,35 +16,53 @@
 
     <header>
         <nav class="container">
-            <a href="#" class="logo">
-                <img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت">
-            </a>
-            <ul class="nav-links">
-                <li><a href="#hero">الرئيسية</a></li>
-                <li><a href="#menu">المنيو</a></li>
-                <li><a href="#contact">تواصل معنا</a></li>
-            </ul>
 
-            <div class="header-controls">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت">
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#hero">الرئيسية</a></li>
+                    <li><a href="#menu">المنيو</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+                <div class="hamburger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </div>
+
+            <div class="nav-center-mobile">
+                 <a href="#" class="logo">
+                    <img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت">
+                </a>
                 <div class="header-socials">
                     <a href="https://www.instagram.com/tikkaplate" target="_blank" title="انستجرام"><img src="images/instagram-icon.svg" alt="Instagram"></a>
                     <a href="https://www.snapchat.com/add/tikkaplate" target="_blank" title="سناب شات"><img src="images/snapchat-icon.svg" alt="Snapchat"></a>
                     <a href="https://www.tiktok.com/@tikkaplate" target="_blank" title="تيك توك"><img src="images/tiktok-icon.svg" alt="TikTok"></a>
                 </div>
-                <label class="theme-switch" for="theme-checkbox" title="تغيير الثيم">
-                    <input type="checkbox" id="theme-checkbox" />
-                    <div class="slider">
-                        <span class="icon moon">🌙</span>
-                        <span class="icon sun">☀️</span>
-                    </div>
-                </label>
             </div>
 
-            <div class="hamburger">
-                <div class="line1"></div>
-                <div class="line2"></div>
-                <div class="line3"></div>
+            <div class="nav-right">
+                <div class="header-controls">
+                    <div class="header-socials-desktop">
+                        <a href="https://www.instagram.com/tikkaplate" target="_blank" title="انستجرام"><img src="images/instagram-icon.svg" alt="Instagram"></a>
+                        <a href="https://www.snapchat.com/add/tikkaplate" target="_blank" title="سناب شات"><img src="images/snapchat-icon.svg" alt="Snapchat"></a>
+                        <a href="https://www.tiktok.com/@tikkaplate" target="_blank" title="تيك توك"><img src="images/tiktok-icon.svg" alt="TikTok"></a>
+                    </div>
+                    <label class="theme-switch-vertical" for="theme-checkbox" title="تغيير الثيم">
+                        <input type="checkbox" id="theme-checkbox" />
+                        <div class="slider-v">
+                            <div class="knob">
+                                <span class="icon sun">☀️</span>
+                                <span class="icon moon">🌙</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
             </div>
+
         </nav>
     </header>
 
@@ -73,7 +91,7 @@
                 <button class="filter-btn" data-filter="drink">مشروبات</button>
             </div>
             <div class="menu-grid">
-                <div class="menu-item" data-category="main">
+                 <div class="menu-item" data-category="main">
                     <img src="images/برياني_كاري.jpg" alt="برياني كاري" loading="lazy">
                     <h3>برياني كاري</h3>
                     <p>أرز برياني فاخر مُبهر بالزعفران ومُزين بالكاجو والبصل المقلي، يُقدم بجانبه قطع الدجاج الطرية المطبوخة في صلصة الكاري الغنية.</p>
@@ -216,7 +234,7 @@
                     <p>📞 <strong>هاتف إضافي:</strong> (سيتم إضافته قريبًا)</p>
                 </div>
                 <div class="contact-map">
-                     <iframe src="https://maps.google.com/maps?q=%D8%AA%D9%83%D8%A7%20%D8%A8%D9%84%D9%8A%D8%AA%D8%8C%20%D8%A7%D9%84%D8%A7%D9%85%D9%8A%D8%B1%20%D8%B3%D9%84%D8%B7%D8%A7%D9%86%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D8%B9%D8%B2%D9%8A%D8%B2%D8%8C%20%D8%AA%D9%8A%D9%85%D8%A7%D8%A1&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="400" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                     <iframe src="http://googleusercontent.com/maps/google.com/0" width="100%" height="400" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </section>
@@ -248,7 +266,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="script.js"></script>
 </body>
