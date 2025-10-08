@@ -80,8 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) { setTheme(savedTheme); }
-    themeToggle.addEventListener('click', () => {
-        setTheme(body.classList.contains('dark-mode') ? 'light' : 'dark');
+   themeCheckbox.addEventListener('change', () => {
+    setTheme(themeCheckbox.checked ? 'dark' : 'light');
+});
     });
 
     // 5. Interactive Menu for Mobile
@@ -200,5 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 });
+
 
 
