@@ -24,7 +24,16 @@
                 <li><a href="#menu">المنيو</a></li>
                 <li><a href="#contact">تواصل معنا</a></li>
             </ul>
-            <button id="theme-toggle" title="تغيير الثيم">🌙</button>
+
+            <div class="header-controls">
+                <div class="header-socials">
+                    <a href="https://www.instagram.com/tikkaplate" target="_blank" title="انستجرام"><img src="images/instagram-icon.svg" alt="Instagram"></a>
+                    <a href="https://www.snapchat.com/add/tikkaplate" target="_blank" title="سناب شات"><img src="images/snapchat-icon.svg" alt="Snapchat"></a>
+                    <a href="https://www.tiktok.com/@tikkaplate" target="_blank" title="تيك توك"><img src="images/tiktok-icon.svg" alt="TikTok"></a>
+                </div>
+                <button id="theme-toggle" title="تغيير الثيم">🌙</button>
+            </div>
+
             <div class="hamburger">
                 <div class="line1"></div>
                 <div class="line2"></div>
@@ -199,11 +208,6 @@
                     <p>⏰ <strong>مواعيد العمل:</strong> يوميًا من 1:00 ظهرًا حتى 3:00 صباحًا.</p>
                     <p>📱 <strong>واتساب:</strong> <a href="https://wa.me/966554242136" target="_blank">+966 55 424 2136</a></p>
                     <p>📞 <strong>هاتف إضافي:</strong> (سيتم إضافته قريبًا)</p>
-                    <div class="social-links">
-                        <a href="https://www.instagram.com/tikkaplate" target="_blank">انستجرام</a>
-                        <a href="https://www.snapchat.com/@tikkaplate" target="_blank">سناب شات</a>
-                        <a href="https://www.tiktok.com/@tikkaplate" target="_blank">تيك توك</a>
-                    </div>
                 </div>
                 <div class="contact-map">
                      <iframe src="https://maps.google.com/maps?q=%D8%AA%D9%83%D8%A7%20%D8%A8%D9%84%D9%8A%D8%AA%D8%8C%20%D8%A7%D9%84%D8%A7%D9%85%D9%8A%D8%B1%20%D8%B3%D9%84%D8%B7%D8%A7%D9%86%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D8%B9%D8%B2%D9%8A%D8%B2%D8%8C%20%D8%AA%D9%8A%D9%85%D8%A7%D8%A1&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="400" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -227,7 +231,7 @@
 
     <div id="cart-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
+            <button class="close-btn" title="إغلاق">×</button>
             <h2>سلة طلباتك</h2>
             <div id="cart-items">
                 <p>سلتك فارغة حاليًا.</p>
@@ -242,5 +246,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>
