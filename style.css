@@ -466,7 +466,7 @@ footer {
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 10; /* Ensure it's on top */
+    z-index: 9999; /* Ensure it's on top */
 }
 .close-btn:hover, .close-btn:focus { color: black; }
 
@@ -662,5 +662,6 @@ body.dark-mode .header-socials img { filter: invert(100%) brightness(1.5); }
         opacity: 0;
     }
 }
+
 
 
