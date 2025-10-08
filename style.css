@@ -94,6 +94,12 @@ nav {
     height: 80px;
 }
 
+.logo {
+    /* تعديل جديد: لضمان المحاذاة العمودية للصورة داخل اللينك */
+    display: flex;
+    align-items: center;
+}
+
 .logo img {
     height: 60px;
 }
@@ -466,7 +472,7 @@ footer {
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 9999; /* تم رفع القيمة لضمان الأولوية */
+    z-index: 9999; 
 }
 .close-btn:hover, .close-btn:focus { color: black; }
 
@@ -514,12 +520,12 @@ footer {
 
 .slider .moon {
     position: absolute;
-    left: 32px;
+    left: 34px; /* تعديل: لضبط التوسيط */
     opacity: 0;
 }
 .slider .sun {
     position: absolute;
-    left: 7px;
+    left: 8px; /* تعديل: لضبط التوسيط */
     opacity: 1;
 }
 
@@ -584,8 +590,6 @@ body.dark-mode .header-socials img { filter: invert(100%) brightness(1.5); }
     .toggle .line2 { opacity: 0; }
     .toggle .line3 { transform: rotate(45deg) translate(-5px, -6px); }
     
-    /* تم حذف إخفاء الأيقونات من هنا للسماح بظهورها */
-
     h2 { font-size: 1.8rem; }
     .hero-content h1 { font-size: 2.0rem; }
     .hero-content p { font-size: 1rem; }
