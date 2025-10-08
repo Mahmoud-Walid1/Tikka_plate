@@ -42,12 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             const filterValue = btn.getAttribute('data-filter');
+            
             menuItems.forEach(item => {
                 item.classList.remove('is-active');
+                // --- THIS IS THE FIX ---
                 if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
-                    item.classList.remove('hide');
+                    item.style.display = 'block'; // Show item
                 } else {
-                    item.classList.add('hide');
+                    item.style.display = 'none'; // Hide item
                 }
             });
         });
@@ -93,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Shopping Cart Logic
     function updateCart() {
+        if (!cartItemsContainer) return; // Exit if cart elements don't exist
         cartItemsContainer.innerHTML = '';
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p>سلتك فارغة حاليًا.</p>';
@@ -145,56 +148,60 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCart();
     }
 
-    addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const name = btn.dataset.name;
-            const price = btn.dataset.price;
-            addToCart(name, price);
-            btn.textContent = 'تمت الإضافة!';
-            setTimeout(() => { btn.textContent = 'أضف للطلب'; }, 1000);
+    if (addToCartBtns.length > 0) {
+        addToCartBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const name = btn.dataset.name;
+                const price = btn.dataset.price;
+                addToCart(name, price);
+                btn.textContent = 'تمت الإضافة!';
+                setTimeout(() => { btn.textContent = 'أضف للطلب'; }, 1000);
+            });
         });
-    });
+    }
 
-    cartIcon.addEventListener('click', () => { cartModal.style.display = 'block'; });
-    closeModalBtn.addEventListener('click', () => { cartModal.style.display = 'none'; });
-    window.addEventListener('click', (e) => {
-        if (e.target == cartModal) { cartModal.style.display = 'none'; }
-    });
-    
-    cartItemsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('quantity-btn')) {
-            const name = e.target.dataset.name;
-            const action = e.target.dataset.action;
-            changeQuantity(name, action);
-        }
-    });
-
-    sendOrderBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('سلتك فارغة! الرجاء إضافة بعض المنتجات أولاً.');
-            return;
-        }
-
-        let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
-        invoice += `-----------------------------------\n`;
-        invoice += `*الطلبات:*\n`;
-        cart.forEach(item => {
-            invoice += `*- (${item.quantity})* ${item.name} | *${item.price * item.quantity} ريال*\n`;
+    if (cartIcon) {
+        cartIcon.addEventListener('click', () => { cartModal.style.display = 'block'; });
+        closeModalBtn.addEventListener('click', () => { cartModal.style.display = 'none'; });
+        window.addEventListener('click', (e) => {
+            if (e.target == cartModal) { cartModal.style.display = 'none'; }
         });
-        invoice += `-----------------------------------\n`;
-        invoice += `*الإجمالي: ${totalPriceEl.textContent} ريال*\n\n`;
-        invoice += `(هذا الطلب تم إرساله من الموقع الإلكتروني، نرجو تأكيده مع العميل)`;
-
-        const restaurantNumber = '966554242136';
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
         
-        const link = document.createElement('a');
-        link.href = whatsappUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
+        cartItemsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('quantity-btn')) {
+                const name = e.target.dataset.name;
+                const action = e.target.dataset.action;
+                changeQuantity(name, action);
+            }
+        });
+
+        sendOrderBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('سلتك فارغة! الرجاء إضافة بعض المنتجات أولاً.');
+                return;
+            }
+
+            let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
+            invoice += `-----------------------------------\n`;
+            invoice += `*الطلبات:*\n`;
+            cart.forEach(item => {
+                invoice += `*- (${item.quantity})* ${item.name} | *${item.price * item.quantity} ريال*\n`;
+            });
+            invoice += `-----------------------------------\n`;
+            invoice += `*الإجمالي: ${totalPriceEl.textContent} ريال*\n\n`;
+            invoice += `(هذا الطلب تم إرساله من الموقع الإلكتروني، نرجو تأكيده مع العميل)`;
+
+            const restaurantNumber = '966554242136';
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
+            
+            const link = document.createElement('a');
+            link.href = whatsappUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
 });
