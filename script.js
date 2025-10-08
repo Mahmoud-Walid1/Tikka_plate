@@ -45,11 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             menuItems.forEach(item => {
                 item.classList.remove('is-active');
-                // --- THIS IS THE FIX ---
                 if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
-                    item.style.display = 'block'; // Show item
+                    item.style.display = 'block';
                 } else {
-                    item.style.display = 'none'; // Hide item
+                    item.style.display = 'none';
                 }
             });
         });
@@ -95,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Shopping Cart Logic
     function updateCart() {
-        if (!cartItemsContainer) return; // Exit if cart elements don't exist
+        if (!cartItemsContainer) return; 
         cartItemsContainer.innerHTML = '';
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p>سلتك فارغة حاليًا.</p>';
@@ -182,7 +181,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // --- التعديلات الجديدة تبدأ هنا ---
+            // 1. قراءة طريقة الاستلام
+            const orderType = document.querySelector('input[name="order-type"]:checked').value;
+            
+            // 2. قراءة الملاحظات
+            const orderNotes = document.getElementById('order-notes-input').value;
+
             let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
+            invoice += `*طريقة الاستلام: ${orderType}*\n\n`; // إضافة طريقة الاستلام للفاتورة
+
+            // إضافة الملاحظات فقط لو كانت مكتوبة
+            if (orderNotes.trim() !== '') {
+                invoice += `*الملاحظات:*\n${orderNotes}\n\n`;
+            }
+
             invoice += `-----------------------------------\n`;
             invoice += `*الطلبات:*\n`;
             cart.forEach(item => {
@@ -191,6 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
             invoice += `-----------------------------------\n`;
             invoice += `*الإجمالي: ${totalPriceEl.textContent} ريال*\n\n`;
             invoice += `(هذا الطلب تم إرساله من الموقع الإلكتروني، نرجو تأكيده مع العميل)`;
+
+            // --- نهاية التعديلات ---
 
             const restaurantNumber = '966554242136';
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
