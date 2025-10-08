@@ -90,6 +90,8 @@ nav.container {
 .nav-left {
     flex: 1;
     justify-content: flex-start;
+    display: flex; 
+    align-items: center; 
 }
 .nav-right {
     flex: 1;
@@ -113,7 +115,6 @@ nav.container {
 .nav-center-mobile .header-socials {
     display: flex;
     gap: 20px;
-    padding: 0 10px;
     justify-content: center;
 }
 .nav-center-mobile .header-socials img {
@@ -154,6 +155,7 @@ h2 {
     margin-bottom: 20px;
     position: relative;
     padding-bottom: 20px;
+    text-align: center;
 }
 h2::after {
     content: ''; position: absolute; display: block; width: 80px; height: 3px;
@@ -161,14 +163,19 @@ h2::after {
     border-radius: 2px;
 }
 
-#hero { height: 70vh; /* Shorter hero for mobile */ position: relative; display: flex; justify-content: center; align-items: center; text-align: center; color: var(--text-light); overflow: hidden; }
+#hero { height: 70vh; position: relative; display: flex; justify-content: center; align-items: center; text-align: center; color: var(--text-light); overflow: hidden; }
 .hero-content h1 { font-size: 2.0rem; }
 .hero-content p { font-size: 1rem; }
 
-#menu { max-width: 100%; padding: 40px 15px; margin: 20px 0; }
+#menu { 
+    max-width: 100%; 
+    padding: 40px 15px; 
+    margin: 20px 0; 
+    background-color: #fff;
+    border-radius: 20px;
+}
 .menu-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 .contact-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
-.modal-content { width: 95%; margin: 20% auto; }
 
 
 /* --- Vertical Theme Toggle --- */
@@ -185,7 +192,6 @@ input:checked + .slider-v .knob .moon { opacity: 1; transform: translateY(0); }
 input:checked + .slider-v .knob .sun { opacity: 0; transform: translateY(-10px); }
 
 
-/* Other base styles copied from previous version... */
 .slider-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; }
 .slider-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; }
 .slider-img.active { opacity: 1; }
@@ -195,10 +201,7 @@ input:checked + .slider-v .knob .sun { opacity: 0; transform: translateY(-10px);
 .filter-btn { background: none; border: 2px solid var(--secondary-color); color: var(--secondary-color); padding: 8px 18px; font-size: 0.9rem; margin: 4px; border-radius: 50px; cursor: pointer; transition: all 0.4s ease; }
 .filter-btn:hover, .filter-btn.active { background-color: var(--secondary-color); color: var(--text-light); }
 .menu-item { position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); height: 320px; cursor: pointer; background-color: #000; transition: all 0.4s ease; }
-.add-to-cart-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--secondary-color); color: #fff; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; z-index: 3; opacity: 0; transition: opacity 0.5s ease; font-weight: bold; }
 .whatsapp-float { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; }
-.cart-float { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; }
-footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
 
 
 /* ============================================
@@ -229,18 +232,21 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
 --- Desktop Styles ---
 ============================================
 */
-@media (min-width: 1024px) {
+@media (min-width: 981px) {
     /* --- Header --- */
     nav.container {
         height: 80px; /* Original desktop height */
     }
     .nav-left {
-        display: flex;
-        align-items: center;
+        flex: 1; 
+        justify-content: flex-start;
         gap: 30px;
     }
     .nav-left .logo, .nav-left .nav-links {
         display: flex; /* Show desktop elements */
+    }
+    .nav-left .logo img {
+        height: 60px; /* Ensure desktop logo size is correct */
     }
     .nav-links {
         list-style: none;
@@ -255,8 +261,15 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
     .nav-links li { padding: 0; }
     
     .nav-right {
+        flex: 1; 
+        display: flex;
+        justify-content: flex-end;
+    }
+    .header-controls {
         display: flex;
         align-items: center;
+        gap: 20px;
+        flex-direction: row;
     }
     .header-socials-desktop {
         display: flex; /* Show desktop socials */
@@ -268,8 +281,17 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
     /* --- General Sections --- */
     h2 { font-size: 2.8rem; }
     #hero { height: 80vh; }
+    .hero-content { padding: 30px 40px; }
     .hero-content h1 { font-size: 4rem; }
     .hero-content p { font-size: 1.5rem; }
+    
+    #menu {
+        max-width: 960px;
+        padding: 60px 40px;
+        margin: 40px auto; /* Center the block */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    }
+
     .menu-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Flexible grid for desktop */
     }
@@ -277,7 +299,6 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
 
 
 /* --- Other styles that don't need media queries --- */
-/* (Copied from previous version) */
 .hamburger div { width: 25px; height: 3px; background-color: var(--text-dark); margin: 5px; transition: all 0.3s ease; }
 .menu-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
 .menu-item h3 { position: absolute; bottom: 0; left: 0; right: 0; padding: 25px 20px 15px; margin: 0; color: #fff; font-size: 1.6rem; z-index: 3; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); transition: all 0.5s ease; }
@@ -288,9 +309,8 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
 .menu-item:hover img, .menu-item.is-active img { transform: scale(1.1); }
 .menu-item:hover h3, .menu-item.is-active h3 { opacity: 0; }
 .menu-item:hover p, .menu-item.is-active p { opacity: 1; }
+.add-to-cart-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--secondary-color); color: #fff; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; z-index: 3; opacity: 0; transition: opacity 0.5s ease, transform 0.3s; font-weight: bold; }
 .menu-item:hover .add-to-cart-btn, .menu-item.is-active .add-to-cart-btn { opacity: 1; }
-.menu-item:hover h3, .menu-item.is-active h3 { opacity: 0; bottom: 50px; }
-.menu-item:hover p, .menu-item.is-active p { opacity: 1; }
 .menu-item:hover .price, .menu-item.is-active .price { top: 10px; left: 10px; padding: 3px 10px; font-size: 1rem; }
 .contact-details h3 { font-size: 2rem; margin-bottom: 20px; }
 .contact-details p { margin-bottom: 15px; font-size: 1.1rem; }
@@ -300,10 +320,10 @@ footer, .modal-footer, .cart-item-controls button, .close-btn { /* etc. */ }
 footer { background-color: var(--text-dark); color: var(--text-light); text-align: center; padding: 20px; transition: background-color 0.4s ease, color 0.4s ease; }
 .whatsapp-float { background-color: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; transition: width 0.3s, height 0.3s; }
 .whatsapp-float img { width: 35px; height: 35px; transition: width 0.3s, height 0.3s; }
-.cart-float { background-color: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; cursor: pointer; font-size: 1.8rem; color: white; transition: width 0.3s, height 0.3s, font-size 0.3s; }
+.cart-float { position: fixed; bottom: 20px; right: 20px; background-color: var(--primary-color); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 100; cursor: pointer; font-size: 1.8rem; color: white; transition: all 0.3s; }
 #cart-counter { position: absolute; top: -5px; right: -5px; background-color: red; color: white; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; transition: all 0.3s; }
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); animation: fadeIn 0.5s; }
-.modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 15px; position: relative; }
+.modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: 15px; position: relative; }
 .close-btn { position: absolute; left: 10px; top: 10px; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: bold; color: #aaa; background: none; border: none; cursor: pointer; z-index: 9999; }
 .close-btn:hover, .close-btn:focus { color: black; }
 #cart-items .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -327,4 +347,3 @@ body.dark-mode .header-socials img, body.dark-mode .header-socials-desktop img {
 @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
 @keyframes pulseGlow { 0% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 0 rgba(200, 90, 43, 0.7); } 70% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 10px rgba(200, 90, 43, 0); } 100% { box-shadow: 0 5px 20px rgba(0,0,0,0.1), 0 0 0 0 rgba(200, 90, 43, 0); } }
-@keyframes tapHint { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } 10%, 50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } 60% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
