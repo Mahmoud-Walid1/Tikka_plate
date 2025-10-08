@@ -5,11 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Selectors ---
     const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
+    // تعديل: استهداف الروابط في مكانها الجديد
+    const navLinks = document.querySelector('.nav-left .nav-links'); 
     const filterBtns = document.querySelectorAll('.filter-btn');
     const menuItems = document.querySelectorAll('.menu-item');
     const sliderImages = document.querySelectorAll('.slider-img');
-    const themeCheckbox = document.getElementById('theme-checkbox'); // تم التغيير هنا
+    const themeCheckbox = document.getElementById('theme-checkbox'); 
     const body = document.body;
     const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
     const cartIcon = document.getElementById('cart-icon');
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ... باقي الملف كما هو بدون تغيير ...
     // 2. Menu Filtering
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -68,17 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
-            themeCheckbox.checked = true; // تعديل: تحديث حالة الزر
+            themeCheckbox.checked = true;
         } else {
             body.classList.remove('dark-mode');
-            themeCheckbox.checked = false; // تعديل: تحديث حالة الزر
+            themeCheckbox.checked = false;
         }
         localStorage.setItem('theme', theme);
     }
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) { setTheme(savedTheme); }
     
-    themeCheckbox.addEventListener('change', () => { // تعديل: تغيير الحدث ليعمل مع الزر الجديد
+    themeCheckbox.addEventListener('change', () => {
         setTheme(themeCheckbox.checked ? 'dark' : 'light');
     });
 
