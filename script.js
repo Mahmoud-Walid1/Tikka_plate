@@ -68,10 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
+            themeCheckbox.checked = true; 
             themeToggle.textContent = '☀️';
             localStorage.setItem('theme', 'dark');
         } else {
             body.classList.remove('dark-mode');
+            themeCheckbox.checked = false;
             themeToggle.textContent = '🌙';
             localStorage.setItem('theme', 'light');
         }
@@ -198,4 +200,5 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 });
+
 
