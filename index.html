@@ -5,45 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم تكا بليت - Tikka Plate</title>
     <meta name="description" content="أشهى المأكولات الهندية الأصيلة من مطعم تكا بليت. اكتشف المنيو الخاص بنا واطلب الآن.">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Lora:wght@600&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
         <nav class="container">
-
             <div class="nav-left">
-                <a href="#" class="logo">
-                    <img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت">
-                </a>
+                <a href="#" class="logo"><img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت"></a>
                 <ul class="nav-links">
                     <li><a href="#hero">الرئيسية</a></li>
                     <li><a href="#menu">المنيو</a></li>
                     <li><a href="#contact">تواصل معنا</a></li>
                 </ul>
                 <div class="hamburger">
-                    <div class="line1"></div>
-                    <div class="line2"></div>
-                    <div class="line3"></div>
+                    <div class="line1"></div><div class="line2"></div><div class="line3"></div>
                 </div>
             </div>
-
             <div class="nav-center-mobile">
-                 <a href="#" class="logo">
-                    <img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت">
-                </a>
+                <a href="#" class="logo"><img src="images/Tikka_Plate_Logo.png" alt="شعار مطعم تكا بليت"></a>
                 <div class="header-socials">
                     <a href="https://www.instagram.com/tikkaplate" target="_blank" title="انستجرام"><img src="images/instagram-icon.svg" alt="Instagram"></a>
                     <a href="https://www.snapchat.com/add/tikkaplate" target="_blank" title="سناب شات"><img src="images/snapchat-icon.svg" alt="Snapchat"></a>
                     <a href="https://www.tiktok.com/@tikkaplate" target="_blank" title="تيك توك"><img src="images/tiktok-icon.svg" alt="TikTok"></a>
                 </div>
             </div>
-
             <div class="nav-right">
                 <div class="header-controls">
                     <div class="header-socials-desktop">
@@ -53,25 +42,17 @@
                     </div>
                     <label class="theme-switch-vertical" for="theme-checkbox" title="تغيير الثيم">
                         <input type="checkbox" id="theme-checkbox" />
-                        <div class="slider-v">
-                            <div class="knob">
-                                <span class="icon sun">☀️</span>
-                                <span class="icon moon">🌙</span>
-                            </div>
-                        </div>
+                        <div class="slider-v"><div class="knob"><span class="icon sun">☀️</span><span class="icon moon">🌙</span></div></div>
                     </label>
                 </div>
             </div>
-
         </nav>
     </header>
 
     <main>
         <section id="hero">
             <div class="slider-container">
-                <img src="images/slide1.jpg" alt="خلفية مطعم تكا بليت 1" class="slider-img active">
-                <img src="images/slide2.jpg" alt="خلفية مطعم تكا بليت 2" class="slider-img">
-                <img src="images/slide3.jpg" alt="خلفية مطعم تكا بليت 3" class="slider-img">
+                <img src="images/slide1.jpg" alt="خلفية 1" class="slider-img active"><img src="images/slide2.jpg" alt="خلفية 2" class="slider-img"><img src="images/slide3.jpg" alt="خلفية 3" class="slider-img">
             </div>
             <div class="hero-overlay"></div>
             <div class="hero-content">
@@ -83,6 +64,7 @@
 
         <section id="menu" class="container">
             <h2>إبداعات تكا بليت</h2>
+
             <div class="menu-filters">
                 <button class="filter-btn active" data-filter="all">الكل</button>
                 <button class="filter-btn" data-filter="main">أطباق رئيسية</button>
@@ -91,137 +73,15 @@
                 <button class="filter-btn" data-filter="drink">مشروبات</button>
             </div>
             <div class="menu-grid">
-                 <div class="menu-item" data-category="main">
+                <div class="menu-item" data-category="main">
                     <img src="images/برياني_كاري.jpg" alt="برياني كاري" loading="lazy">
                     <h3>برياني كاري</h3>
                     <p>أرز برياني فاخر مُبهر بالزعفران ومُزين بالكاجو والبصل المقلي، يُقدم بجانبه قطع الدجاج الطرية المطبوخة في صلصة الكاري الغنية.</p>
                     <span class="price">21 ريال</span>
                     <button class="add-to-cart-btn" data-name="برياني كاري" data-price="21">أضف للطلب</button>
                 </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/وجبة_برياني_كاري.jpg" alt="وجبة برياني كاري" loading="lazy">
-                    <h3>وجبة برياني كاري</h3>
-                    <p>وجبتك المتكاملة من البرياني كاري الشهي، تأتيك مع صوص خاص منعش ومشروب غازي لإكمال تجربة الطعم الهندي الرائع.</p>
-                    <span class="price">24 ريال</span>
-                    <button class="add-to-cart-btn" data-name="وجبة برياني كاري" data-price="24">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/برياني_بتر_تشيكن.jpg" alt="برياني بتر تشيكن" loading="lazy">
-                    <h3>برياني بتر تشيكن</h3>
-                    <p>طبق يجمع بين أشهر نكهتين في الهند: دجاج بتر تشيكن الشهير بصلصته الكريمية الغنية بالزبدة والطماطم، مقدم مع أرز برياني فاخر.</p>
-                    <span class="price">21 ريال</span>
-                    <button class="add-to-cart-btn" data-name="برياني بتر تشيكن" data-price="21">أضف للطلب</button>
-                </div>
-                 <div class="menu-item" data-category="main">
-                    <img src="images/وجبة_برياني_بتر_تشيكن.jpg" alt="وجبة برياني بتر تشيكن" loading="lazy">
-                    <h3>وجبة برياني بتر تشيكن</h3>
-                    <p>وجبة متكاملة من طبق البرياني بتر تشيكن الغني بالنكهة، تأتيك مع صوص خاص ومنعش بالإضافة لمشروب غازي.</p>
-                    <span class="price">24 ريال</span>
-                    <button class="add-to-cart-btn" data-name="وجبة برياني بتر تشيكن" data-price="24">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/رز_ساده.jpg" alt="رز ساده" loading="lazy">
-                    <h3>رز سادة</h3>
-                    <p>أرز بسمتي أبيض فاخر، مطهو على البخار ومُزين بالزعفران، الكاجو، والبصل المقلي المقرمش لإضافة نكهة غنية.</p>
-                    <span class="price">7 ريال</span>
-                    <button class="add-to-cart-btn" data-name="رز سادة" data-price="7">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/تكا_بليت.jpg" alt="تكا بليت" loading="lazy">
-                    <h3>تكا بليت</h3>
-                    <p>طبق غني بقطع دجاج تكا الطرية والمشوية بعناية، متبلة بالبهارات الهندية الأصيلة ومغطاة بطبقة سخية من الصوص الكريمي الخاص بنا.</p>
-                    <span class="price">13 ريال</span>
-                    <button class="add-to-cart-btn" data-name="تكا بليت" data-price="13">أضف للطلب</button>
-                </div>
-                 <div class="menu-item" data-category="main">
-                    <img src="images/صحن_مسالا_زبده.jpg" alt="صحن مسالا زبده" loading="lazy">
-                    <h3>صحن مسالا زبدة</h3>
-                    <p>قطع دجاج طرية مطبوخة في صلصة المسالا الكريمية الغنية بالزبدة ومزيج من التوابل الهندية الأصيلة.</p>
-                    <span class="price">15 ريال</span>
-                    <button class="add-to-cart-btn" data-name="صحن مسالا زبدة" data-price="15">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/صحن_مسالا_كاري.jpg" alt="صحن مسالا كاري" loading="lazy">
-                    <h3>صحن مسالا كاري</h3>
-                    <p>قطع الدجاج الطرية المغمورة في صلصة الكاري مسالا الغنية، والمُحضّرة من مزيج التوابل الهندية التقليدية.</p>
-                    <span class="price">15 ريال</span>
-                    <button class="add-to-cart-btn" data-name="صحن مسالا كاري" data-price="15">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="main">
-                    <img src="images/صحن_مسالا_لحم.jpg" alt="صحن مسالا لحم" loading="lazy">
-                    <h3>صحن مسالا لحم</h3>
-                    <p>قطع لحم طرية وشهية، مطبوخة ببطء في صلصة المسالا الغنية بالتوابل الهندية العطرية، لتقدم لك مذاقًا عميقًا وأصيلًا.</p>
-                    <span class="price">27 ريال</span>
-                    <button class="add-to-cart-btn" data-name="صحن مسالا لحم" data-price="27">أضف للطلب</button>
-                </div>
-
-                <div class="menu-item" data-category="appetizer">
-                    <img src="images/سندويش_تكا_نان.jpg" alt="سندويش تكا نان" loading="lazy">
-                    <h3>سندويش تكا نان</h3>
-                    <p>قطع دجاج تكا الشهية المشوية على الفحم والمتبلة، ملفوفة بعناية داخل خبز النان الطازج مع صوص كريمي لذيذ.</p>
-                    <span class="price">9 ريال</span>
-                    <button class="add-to-cart-btn" data-name="سندويش تكا نان" data-price="9">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="appetizer">
-                    <img src="images/لولي_بوب.jpg" alt="لولي بوب" loading="lazy">
-                    <h3>لولي بوب</h3>
-                    <p>أجنحة دجاج شهية متبلة على طريقة 'لولي بوب' الهندية الشهيرة، مقلية بعناية حتى تصل للقرمشة المثالية.</p>
-                    <span class="price">10 ريال</span>
-                    <button class="add-to-cart-btn" data-name="لولي بوب" data-price="10">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="appetizer">
-                    <img src="images/تكا_فرايز.jpg" alt="تكا فرايز" loading="lazy">
-                    <h3>تكا فرايز</h3>
-                    <p>بطاطس ذهبية مقرمشة، يعلوها قطع من دجاج تكا المشوي والمتبل، غارقة في صوص كريمي خاص.</p>
-                    <span class="price">12 ريال</span>
-                    <button class="add-to-cart-btn" data-name="تكا فرايز" data-price="12">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="appetizer">
-                    <img src="images/بطاطس_بالصوص.jpg" alt="بطاطس بالصوص" loading="lazy">
-                    <h3>بطاطس بالصوص</h3>
-                    <p>بطاطس ذهبية مقرمشة، غارقة في صوص الجبن الشيدر الغني والكريمي.</p>
-                    <span class="price">7 ريال</span>
-                    <button class="add-to-cart-btn" data-name="بطاطس بالصوص" data-price="7">أضف للطلب</button>
-                </div>
-
-                <div class="menu-item" data-category="bread">
-                    <img src="images/خبز_نان.jpg" alt="خبز نان" loading="lazy">
-                    <h3>خبز نان</h3>
-                    <p>خبز نان مخمر بيضاوي مطبوخ تقليديا في فرن طيني مع الفحم.</p>
-                    <span class="price">1 ريال</span>
-                    <button class="add-to-cart-btn" data-name="خبز نان" data-price="1">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="bread">
-                    <img src="images/خبز_بالجبنه_والزبدة.jpg" alt="خبز بالجبنه والزبدة" loading="lazy">
-                    <h3>خبز بالجبنة والزبدة</h3>
-                    <p>خبز نان طازج وساخن من الفرن الطيني، محشو بالجبنة الذائبة ومدهون بالزبدة مع رشة من الثوم والبقدونس.</p>
-                    <span class="price">5 ريال</span>
-                    <button class="add-to-cart-btn" data-name="خبز بالجبنة والزبدة" data-price="5">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="bread">
-                    <img src="images/نان_بالعسل.jpg" alt="نان بالعسل" loading="lazy">
-                    <h3>نان بالعسل</h3>
-                    <p>خبز نان طازج ودافئ من الفرن، مغطى بطبقة غنية من العسل الذهبي ومُزين بقطع الكاجو المقرمشة.</p>
-                    <span class="price">7 ريال</span>
-                    <button class="add-to-cart-btn" data-name="نان بالعسل" data-price="7">أضف للطلب</button>
-                </div>
-
-                <div class="menu-item" data-category="drink">
-                    <img src="images/مياه.png" alt="مياه" loading="lazy">
-                    <h3>مياه</h3>
-                    <p>مياه معدنية نقية.</p>
-                    <span class="price">1 ريال</span>
-                    <button class="add-to-cart-btn" data-name="مياه" data-price="1">أضف للطلب</button>
-                </div>
-                <div class="menu-item" data-category="drink">
-                    <img src="images/مشروبات_غازية.jpg" alt="مشروبات غازية" loading="lazy">
-                    <h3>مشروبات غازية</h3>
-                    <p>اختر مشروبك الغازي المفضل ليكمل وجبتك (بيبسي، فانتا، ماونتن ديو).</p>
-                    <span class="price">3 ريال</span>
-                    <button class="add-to-cart-btn" data-name="مشروبات غازية" data-price="3">أضف للطلب</button>
-                </div>
             </div>
-        </section>
+            </section>
 
         <section id="contact" class="container">
             <h2>تواصل معنا</h2>
@@ -231,7 +91,6 @@
                     <p>📍 <strong>العنوان:</strong> الأمير سلطان بن عبد العزيز، تيماء 45911، المملكة العربية السعودية.</p>
                     <p>⏰ <strong>مواعيد العمل:</strong> يوميًا من 1:00 ظهرًا حتى 3:00 صباحًا.</p>
                     <p>📱 <strong>واتساب:</strong> <a href="https://wa.me/966554242136" target="_blank">+966 55 424 2136</a></p>
-                    <p>📞 <strong>هاتف إضافي:</strong> (سيتم إضافته قريبًا)</p>
                 </div>
                 <div class="contact-map">
                     <iframe src="https://www.google.com/maps0" width="100%" height="400" style="border:0; border-radius: 10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -244,36 +103,22 @@
         <p>جميع الحقوق محفوظة © 2025 - مطعم تكا بليت</p>
     </footer>
 
-    <a href="https://wa.me/966554242136" class="whatsapp-float" target="_blank">
-        <img src="images/whatsapp-icon.svg" alt="تواصل عبر واتساب">
-    </a>
-    
-    <div id="cart-icon" class="cart-float">
-        🛒
-        <span id="cart-counter">0</span>
-    </div>
+    <a href="https://wa.me/966554242136" class="whatsapp-float" target="_blank"><img src="images/whatsapp-icon.svg" alt="تواصل واتساب"></a>
+    <div id="cart-icon" class="cart-float">🛒<span id="cart-counter">0</span></div>
 
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <button class="close-btn" title="إغلاق">×</button>
             <h2>سلة طلباتك</h2>
-            <div id="cart-items">
-                <p>سلتك فارغة حاليًا.</p>
-            </div>
-
+            <div id="cart-items"><p>سلتك فارغة حاليًا.</p></div>
             <div class="order-options">
                 <h4>طريقة الاستلام:</h4>
-                <label>
-                    <input type="radio" name="order-type" value="توصيل" checked> توصيل
-                </label>
-                <label>
-                    <input type="radio" name="order-type" value="تيك أواي (استلام من الفرع)"> تيك أواي (استلام من الفرع)
-                </label>
+                <label><input type="radio" name="order-type" value="توصيل" checked> توصيل</label>
+                <label><input type="radio" name="order-type" value="تيك أواي"> تيك أواي</label>
             </div>
-
             <div class="order-notes">
                 <h4>إضافة ملاحظات:</h4>
-                <textarea id="order-notes-input" placeholder="مثال: بدون بصل، صوص إضافي..."></textarea>
+                <textarea id="order-notes-input" placeholder="مثال: بدون بصل..."></textarea>
             </div>
             <div class="modal-footer">
                 <h3>الإجمالي: <span id="total-price">0</span> ريال</h3>
@@ -281,7 +126,6 @@
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
