@@ -2,7 +2,6 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
-    // ... (بداية الملف والتحقق من كلمة السر زي ما هي) ...
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
@@ -10,7 +9,6 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // ... (الاتصال بجوجل شيت زي ما هو) ...
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -20,27 +18,41 @@ module.exports = async (req, res) => {
         const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
         await doc.loadInfo();
         const sheet = doc.sheetsByIndex[0];
+        
+        const requiredHeaders = ['رقم الفاتورة', 'تم التسليم'];
+        const actualHeaders = sheet.headerValues;
+        for (const header of requiredHeaders) {
+            if (!actualHeaders.includes(header)) {
+                throw new Error(`Column "${header}" not found in Google Sheet.`);
+            }
+        }
+
         const rows = await sheet.getRows();
 
-        // <<< === بداية التعديل: هنفلتر السطور الفاضية === >>>
         const orders = rows
-            .filter(row => row.get('رقم الفاتورة')) // السطر ده هيتجاهل أي صف معندوش رقم فاتورة
+            .filter(row => row.get('رقم الفاتورة'))
             .map(row => ({
                 rowId: row.offset,
-                InvoiceID: row.get('رقم الفاتورة'),
-                CustomerPhone: row.get('رقم العميل'),
-                OrderDetails: row.get('تفاصيل الطلب'),
-                TotalAmount: row.get('الإجمالي المدفوع'),
-                Status: row.get('حالة الدفع'),
-                OrderTime: row.get('وقت الطلب'),
+                InvoiceID: row.get('رقم الفاتورة') || 'N/A',
+                CustomerPhone: row.get('رقم العميل') || 'N/A',
+                OrderDetails: row.get('تفاصيل الطلب') || 'N/A',
+                TotalAmount: row.get('الإجمالي المدفوع') || '0',
+                Status: row.get('حالة الدفع') || 'N/A',
+                OrderTime: row.get('وقت الطلب') || 'N/A',
                 Delivered: row.get('تم التسليم') === 'نعم'
             }));
-        // <<< === نهاية التعديل === >>>
         
-        // ... (باقي الكود وترتيب الطلبات زي ما هو) ...
-        const sortedOrders = orders.sort((a, b) => { /* ... */ });
+        const sortedOrders = orders.sort((a, b) => {
+             try {
+                const dateA = new Date(a.OrderTime.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3'));
+                const dateB = new Date(b.OrderTime.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3'));
+                return dateB - dateA;
+             } catch (e) { return 0; }
+        });
+
         res.status(200).json(sortedOrders);
     } catch (error) {
-        // ... (نهاية الملف زي ما هي) ...
+        console.error('Google Sheet Fetch Error:', error);
+        res.status(500).json({ error: 'Failed to fetch orders from Google Sheets.', details: error.message });
     }
 };
