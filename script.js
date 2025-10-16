@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     // --- State for the cart ---
     let cart = [];
 
@@ -17,9 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartCounter = document.getElementById('cart-counter');
     const cartItemsContainer = document.getElementById('cart-items');
     const totalPriceEl = document.getElementById('total-price');
+    
+    // --- بداية التعديل: تحديد الأزرار الجديدة ---
     const sendOrderBtn = document.getElementById('send-order-btn');
-    const payOnlineBtn = document.getElementById('pay-online-btn');
-    const paymentStatus = document.getElementById('payment-status');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    // --- نهاية التعديل ---
     
     // 1. Mobile Navigation
     hamburger.addEventListener('click', () => {
@@ -70,20 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
-            if(themeCheckbox) themeCheckbox.checked = true;
+            themeCheckbox.checked = true;
         } else {
             body.classList.remove('dark-mode');
-            if(themeCheckbox) themeCheckbox.checked = false;
+            themeCheckbox.checked = false;
         }
         localStorage.setItem('theme', theme);
     }
-    if(themeCheckbox){
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) { setTheme(savedTheme); }
-        themeCheckbox.addEventListener('change', () => {
-            setTheme(themeCheckbox.checked ? 'dark' : 'light');
-        });
-    }
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) { setTheme(savedTheme); }
+    
+    themeCheckbox.addEventListener('change', () => {
+        setTheme(themeCheckbox.checked ? 'dark' : 'light');
+    });
 
     // 5. Interactive Menu for Mobile
     menuItems.forEach(item => {
@@ -177,48 +179,62 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // --- Moyasar Payment Logic ---
-        payOnlineBtn.addEventListener('click', async () => {
-             if (cart.length === 0) {
-                alert('سلتك فارغة!');
+        // --- بداية التعديل: منطق زر الدفع الإلكتروني ---
+        checkoutBtn.addEventListener('click', async () => {
+            if (cart.length === 0) {
+                alert('سلتك فارغة! الرجاء إضافة بعض المنتجات أولاً.');
                 return;
             }
 
-            payOnlineBtn.disabled = true;
-            paymentStatus.textContent = 'جاري تجهيز صفحة الدفع...';
-            paymentStatus.className = 'status';
-            paymentStatus.style.display = 'block';
+            const customerPhone = document.getElementById('customer-phone-input').value;
+            if (!customerPhone || !/^[0-9]{10}$/.test(customerPhone)) {
+                alert('الرجاء إدخال رقم جوال سعودي صحيح مكون من 10 أرقام (مثال: 0512345678).');
+                return;
+            }
 
-            const totalAmount = totalPriceEl.textContent;
-            const description = cart.map(item => `${item.quantity}x ${item.name}`).join(', ');
+            const totalPrice = parseFloat(totalPriceEl.textContent) * 100;
+
+            checkoutBtn.textContent = 'جاري التحضير...';
+            checkoutBtn.disabled = true;
 
             try {
                 const response = await fetch('/api/create-payment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: totalAmount, description: description }),
+                    body: JSON.stringify({
+                        amount: totalPrice,
+                        cart: cart,
+                        phone: customerPhone
+                    }),
                 });
 
                 const data = await response.json();
 
-                if (!data.success) {
-                    throw new Error(data.message);
+                if (response.ok) {
+                    window.location.href = data.paymentUrl;
+                } else {
+                    alert(`حدث خطأ: ${data.message}`);
+                    checkoutBtn.textContent = '💳 الدفع بالبطاقة';
+                    checkoutBtn.disabled = false;
                 }
-                
-                // Redirect to Moyasar's payment page
-                window.location.href = data.payment_url;
-
             } catch (error) {
-                paymentStatus.textContent = `فشل: ${error.message}`;
-                paymentStatus.className = 'status error';
-                payOnlineBtn.disabled = false;
+                console.error('Error:', error);
+                alert('حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.');
+                checkoutBtn.textContent = '💳 الدفع بالبطاقة';
+                checkoutBtn.disabled = false;
             }
         });
 
-        // --- WhatsApp Order Logic ---
+        // --- بداية التعديل: منطق زر واتساب ---
         sendOrderBtn.addEventListener('click', () => {
             if (cart.length === 0) {
                 alert('سلتك فارغة! الرجاء إضافة بعض المنتجات أولاً.');
+                return;
+            }
+
+            const customerPhone = document.getElementById('customer-phone-input').value;
+            if (!customerPhone || !/^[0-9]{10}$/.test(customerPhone)) {
+                alert('الرجاء إدخال رقم جوال سعودي صحيح مكون من 10 أرقام (مثال: 0512345678).');
                 return;
             }
 
@@ -226,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderNotes = document.getElementById('order-notes-input').value;
 
             let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
+            invoice += `*رقم جوال العميل: ${customerPhone}*\n`; // إضافة رقم الجوال للفاتورة
             invoice += `*طريقة الاستلام: ${orderType}*\n\n`;
 
             if (orderNotes.trim() !== '') {
@@ -244,13 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const restaurantNumber = '966554242136';
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
             
-            const link = document.createElement('a');
-            link.href = whatsappUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            window.open(whatsappUrl, '_blank');
         });
     }
 });
