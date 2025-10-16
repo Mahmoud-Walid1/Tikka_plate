@@ -11,15 +11,15 @@ module.exports = async (req, res) => {
         
         const host = req.headers.host;
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
-        const successUrl = `${protocol}://${host}/success.html`;
+        
+        // <<< === التعديل المهم: رجعنا نضيف ?id={id} في آخر الرابط === >>>
+        const successUrl = `${protocol}://${host}/success.html?id={id}`;
 
-        // <<< === التعديل: رجعنا للطريقة الصحيحة وهي إنشاء "فاتورة" === >>>
         const moyasarResponse = await axios.post('https://api.moyasar.com/v1/invoices', {
             amount: Math.round(amount),
             currency: 'SAR',
             description: `طلب من تكا بليت لـ ${phone}`,
             success_url: successUrl,
-            // الـ metadata دي مهمة جدًا عشان هتجيلنا في إشعار الدفع
             metadata: {
                 customer_phone: phone,
                 cart_items: JSON.stringify(cart)
@@ -31,7 +31,6 @@ module.exports = async (req, res) => {
             }
         });
 
-        // رابط صفحة الدفع في الفواتير هو moyasarResponse.data.url
         res.status(200).json({ paymentUrl: moyasarResponse.data.url });
 
     } catch (error) {
