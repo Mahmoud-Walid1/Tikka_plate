@@ -1,7 +1,5 @@
-// لاستخدام axios نحتاج نثبته الأول
-// افتح الـ Terminal واكتب: npm install axios
-// ولو معندكش package.json اكتب الأول: npm init -y
-const axios = require('axios');
+// بداية التعديل: غيرنا طريقة الاستدعاء لتكون متوافقة
+import axios from 'axios';
 
 export default async function handler(req, res) {
     // نتأكد أن الطلب من نوع POST فقط
@@ -17,7 +15,10 @@ export default async function handler(req, res) {
         const description = `طلب من مطعم تكا بليت. إجمالي: ${amount / 100} ريال.`;
         
         // رابط صفحة الشكر اللي هيرجع لها العميل بعد الدفع بنجاح
-        const callbackUrl = `${process.env.VERCEL_URL}/success.html`;
+        // طريقة أفضل لضمان الرابط الصحيح سواء على Vercel أو جهازك
+        const host = req.headers.host;
+        const protocol = host.startsWith('localhost') ? 'http' : 'https';
+        const callbackUrl = `${protocol}://${host}/success.html`;
 
         const moyasarResponse = await axios.post('https://api.moyasar.com/v1/payments', {
             amount: amount,
@@ -40,6 +41,7 @@ export default async function handler(req, res) {
         res.status(200).json({ paymentUrl: moyasarResponse.data.source.transaction_url });
 
     } catch (error) {
+        // طباعة الخطأ في Vercel logs عشان نعرف لو حصلت مشكلة
         console.error('Moyasar API Error:', error.response ? error.response.data : error.message);
         res.status(500).json({ message: 'فشل في إنشاء عملية الدفع.' });
     }
