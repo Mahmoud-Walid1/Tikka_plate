@@ -2,6 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
+    // 1. التحقق من كلمة المرور
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
@@ -14,6 +15,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'Row ID is missing.' });
         }
 
+        // 2. الاتصال بجوجل شيت
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -21,14 +23,20 @@ module.exports = async (req, res) => {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
         const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        await doc.loadInfo();
-        const sheet = doc.sheetsByIndex[0];
+        
+        // <<< === بداية الإصلاح: هنا نتأكد من تحميل كل حاجة أولاً === >>>
+        await doc.loadInfo(); 
+        const sheet = doc.sheetsByIndex[0]; 
+        await sheet.loadHeaderRow(); // هذا هو السطر المهم الذي كان ناقصًا
+        // <<< === نهاية الإصلاح === >>>
+
         const rows = await sheet.getRows();
 
+        // 3. البحث عن الصف وتحديثه
         const rowToUpdate = rows.find(row => row.offset === rowId);
         if (rowToUpdate) {
             rowToUpdate.set('تم التسليم', 'نعم');
-            await rowToUpdate.save();
+            await rowToUpdate.save(); // نحفظ التغيير
             res.status(200).json({ success: true });
         } else {
             res.status(404).json({ error: 'Row not found.' });
