@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الطلبات - تكا بليت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #1E5637; }
+        #password-prompt { display: flex; justify-content: center; align-items: center; height: 80vh; }
+        #password-form { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        #password-input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-left: 10px; }
+        #dashboard-content { display: none; }
+        #orders-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .order-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; border-right: 5px solid #C85A2B; transition: transform 0.2s; }
+        .order-card:hover { transform: translateY(-5px); }
+        .order-card h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; }
+        .order-card p { margin: 10px 0; }
+        .order-card pre { background: #f9f9f9; padding: 10px; border-radius: 4px; white-space: pre-wrap; font-family: 'Tajawal', sans-serif; line-height: 1.7; }
+        strong { color: #333; }
+        .refresh-btn { position: fixed; bottom: 20px; left: 20px; background-color: #1E5637; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    
+    <div id="password-prompt">
+        <div id="password-form">
+            <h2>لوحة التحكم محمية</h2>
+            <p>الرجاء إدخال كلمة المرور لعرض الطلبات</p>
+            <input type="password" id="password-input" placeholder="كلمة المرور">
+            <button type="button" id="password-submit">دخول</button>
+        </div>
+    </div>
+
+    <div id="dashboard-content">
+        <h1>📋 طلبات تكا بليت الجديدة</h1>
+        <div id="orders-container">
+            </div>
+        <button id="refresh-now" class="refresh-btn" title="تحديث الآن">🔄</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordPrompt = document.getElementById('password-prompt');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const passwordInput = document.getElementById('password-input');
+            const passwordSubmit = document.getElementById('password-submit');
+            const refreshBtn = document.getElementById('refresh-now');
+
+            let sessionPassword = ''; // لتخزين كلمة المرور
+
+            passwordSubmit.addEventListener('click', main);
+            passwordInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') main();
+            });
+            refreshBtn.addEventListener('click', () => fetchAndRenderOrders(sessionPassword));
+
+            async function main() {
+                const password = passwordInput.value;
+                if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
+                
+                sessionPassword = password;
+                passwordPrompt.innerHTML = '<p>جاري التحقق والتحميل...</p>';
+                
+                const success = await fetchAndRenderOrders(sessionPassword);
+
+                if (success) {
+                    passwordPrompt.style.display = 'none';
+                    dashboardContent.style.display = 'block';
+                    // تحديث الطلبات تلقائيًا كل 30 ثانية
+                    setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
+                } else {
+                     passwordPrompt.innerHTML = '<p style="color: red;">كلمة المرور غير صحيحة. حاول مرة أخرى.</p>';
+                     setTimeout(() => location.reload(), 2000);
+                }
+            }
+
+            async function fetchAndRenderOrders(password) {
+                try {
+                    const response = await fetch('/api/get-orders', {
+                        headers: { 'Authorization': password }
+                    });
+                    if (!response.ok) { return false; }
+                    
+                    const orders = await response.json();
+                    const container = document.getElementById('orders-container');
+                    container.innerHTML = '';
+                    
+                    if (orders.length === 0) {
+                        container.innerHTML = '<h2>لا توجد طلبات جديدة حاليًا...</h2>';
+                        return true;
+                    }
+
+                    orders.forEach(order => {
+                        const card = document.createElement('div');
+                        card.className = 'order-card';
+                        card.innerHTML = `
+                            <h3>فاتورة: ${order.InvoiceID}</h3>
+                            <p><strong>وقت الطلب:</strong> ${order.OrderTime}</p>
+                            <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone}">${order.CustomerPhone}</a></p>
+                            <p><strong>الإجمالي المدفوع:</strong> ${order.TotalAmount} ريال</p>
+                            <p><strong>تفاصيل الطلب:</strong></p>
+                            <pre>${order.OrderDetails}</pre>
+                        `;
+                        container.appendChild(card);
+                    });
+                    return true;
+                } catch (error) {
+                    console.error('Failed to fetch orders:', error);
+                    return false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
