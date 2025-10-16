@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
     try {
         const { rowId } = req.body; // نستقبل رقم الصف اللي عايزين نعدله
-        if (!rowId) {
+        if (rowId === undefined) { // نتأكد إن رقم الصف وصل
             return res.status(400).json({ error: 'Row ID is missing.' });
         }
 
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         // 3. نلاقي الصف المطلوب ونعدله
         const rowToUpdate = rows.find(row => row.offset === rowId);
         if (rowToUpdate) {
-            rowToUpdate.set('تم التسليم', 'TRUE'); // نعمل علامة صح في المربع
+            rowToUpdate.set('تم التسليم', 'نعم'); // نعمل علامة صح في المربع
             await rowToUpdate.save(); // نحفظ التغيير
             res.status(200).json({ success: true, message: `Order ${rowId} marked as completed.` });
         } else {
