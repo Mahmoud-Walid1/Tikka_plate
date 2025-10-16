@@ -13,11 +13,12 @@ module.exports = async (req, res) => {
         
         const host = req.headers.host;
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
-        //  <<< بداية التعديل: غيرنا اسم الرابط لـ success_url ليتوافق مع الفواتير >>>
+
+        // <<< === بداية التعديل المهم: أضفنا ?id={id} في آخر الرابط === >>>
         const successUrl = `${protocol}://${host}/success.html?id={id}`;
-        // <<< بداية التعديل: غيرنا الرابط إلى /v1/invoices لإنشاء صفحة دفع >>>
+        // <<< === نهاية التعديل المهم === >>>
+
         const moyasarResponse = await axios.post('https://api.moyasar.com/v1/invoices', {
-            // <<< بداية التعديل: استخدمنا Math.round() لضمان أن المبلغ رقم صحيح >>>
             amount: Math.round(amount),
             currency: 'SAR',
             description: description,
@@ -33,11 +34,9 @@ module.exports = async (req, res) => {
             }
         });
 
-        // <<< بداية التعديل: رابط صفحة الدفع الآن يأتي من moyasarResponse.data.url >>>
         res.status(200).json({ paymentUrl: moyasarResponse.data.url });
 
     } catch (error) {
-        // هذا السطر مهم جدًا لأنه يطبع لنا الخطأ بالتفصيل في Vercel logs
         console.error('Moyasar API Error:', error.response ? error.response.data : error.message);
         res.status(500).json({ message: 'فشل في إنشاء عملية الدفع.' });
     }
