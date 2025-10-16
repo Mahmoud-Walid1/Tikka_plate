@@ -82,26 +82,22 @@
 </head>
 <body>
     <div class="container">
-        
         <div id="loader">
             <h1>لحظات من فضلك...</h1>
             <p>جاري تأكيد وتسجيل طلبك النهائي في نظامنا.</p>
         </div>
-
         <div id="final-message">
             <div class="icon success-icon">✓</div>
             <h1>شكراً لك! تم استلام طلبك</h1>
             <p>طلبك الآن دخل نظامنا مباشرة وجاري تحضيره. لا حاجة لأي إجراء آخر من طرفك.</p>
             <a href="/" class="btn">العودة للصفحة الرئيسية</a>
         </div>
-        
         <div id="error-area">
             <div class="icon error-icon">!</div>
             <h1>حدث خطأ في التسجيل</h1>
             <p>لم نتمكن من تسجيل طلبك تلقائيًا. نرجو العلم أن المبلغ تم دفعه بنجاح. يرجى التواصل معنا عبر واتساب لتأكيد الطلب يدويًا.</p>
              <a href="https://wa.me/966554242136" class="btn" target="_blank">تواصل معنا عبر واتساب</a>
         </div>
-
     </div>
 
     <script>
@@ -112,6 +108,10 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const invoiceId = urlParams.get('id');
+
+            // <<< === السطر الجديد والمهم لكشف المشكلة === >>>
+            alert("رقم الفاتورة اللي وصل للصفحة هو: " + invoiceId); 
+            // <<< ======================================== >>>
 
             if (!invoiceId) {
                 loader.style.display = 'none';
