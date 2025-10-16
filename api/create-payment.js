@@ -12,8 +12,8 @@ module.exports = async (req, res) => {
         const host = req.headers.host;
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
         
-        // <<< === التعديل المهم: رجعنا نضيف ?id={id} في آخر الرابط === >>>
-        const successUrl = `${protocol}://${host}/success.html?id={id}`;
+        // <<< === التعديل: رابط نجاح بسيط ونظيف === >>>
+        const successUrl = `${protocol}://${host}/success.html`;
 
         const moyasarResponse = await axios.post('https://api.moyasar.com/v1/invoices', {
             amount: Math.round(amount),
