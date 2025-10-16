@@ -1,30 +1,44 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const crypto = require('crypto'); // نستدعي مكتبة التشفير
 
 module.exports = async (req, res) => {
-    // نتأكد إن الرسالة جاية من ميسّر وهي من نوع POST
     if (req.method !== 'POST') {
         return res.status(405).end();
     }
 
+    // <<< بداية خطوة التحقق من التوقيع >>>
+    const signature = req.headers['moyasar-signature'];
+    const webhookSecret = process.env.MOYASAR_WEBHOOK_SECRET;
+
+    if (!signature) {
+        return res.status(401).send('Signature is missing.');
+    }
+
+    const computedSignature = crypto
+        .createHmac('sha256', webhookSecret)
+        .update(JSON.stringify(req.body))
+        .digest('hex');
+
+    if (signature !== computedSignature) {
+        return res.status(401).send('Signature is not valid.');
+    }
+    // <<< نهاية خطوة التحقق من التوقيع >>>
+
     try {
         const event = req.body;
 
-        // نستمع فقط للحدث اللي يهمنا: لما الفاتورة تتدفع
         if (event.type === 'invoice.paid') {
             const invoice = event.data;
-
-            // 1. نتصل بملف جوجل شيت
+            
             const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID);
             const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
             await doc.useServiceAccountAuth(creds);
             await doc.loadInfo();
             const sheet = doc.sheetsByIndex[0];
 
-            // 2. (خطوة أمان) نتأكد إننا مسجلناش الطلب ده قبل كده
             const rows = await sheet.getRows();
             const alreadyExists = rows.some(row => row.get('رقم الفاتورة') === invoice.id);
 
-            // 3. لو الطلب مش موجود، نسجله
             if (!alreadyExists) {
                 const cartItems = JSON.parse(invoice.metadata.cart_items);
                 let orderDetailsText = '';
@@ -43,7 +57,6 @@ module.exports = async (req, res) => {
             }
         }
         
-        // 4. نرد على ميسّر ونقولهم "تمام، الإشعار وصل"
         res.status(200).send({ status: 'received' });
 
     } catch (error) {
