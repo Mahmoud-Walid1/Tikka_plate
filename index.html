@@ -53,7 +53,12 @@
                     </div>
                     <label class="theme-switch-vertical" for="theme-checkbox" title="تغيير الثيم">
                         <input type="checkbox" id="theme-checkbox" />
-                        <div class="slider-v"><div class="knob"><span class="icon sun">☀️</span><span class="icon moon">🌙</span></div></div>
+                        <div class="slider-v">
+                            <div class="knob">
+                                <span class="icon sun">☀️</span>
+                                <span class="icon moon">🌙</span>
+                            </div>
+                        </div>
                     </label>
                 </div>
             </div>
@@ -64,7 +69,9 @@
     <main>
         <section id="hero">
             <div class="slider-container">
-                <img src="images/slide1.jpg" alt="خلفية 1" class="slider-img active"><img src="images/slide2.jpg" alt="خلفية 2" class="slider-img"><img src="images/slide3.jpg" alt="خلفية 3" class="slider-img">
+                <img src="images/slide1.jpg" alt="خلفية مطعم تكا بليت 1" class="slider-img active">
+                <img src="images/slide2.jpg" alt="خلفية مطعم تكا بليت 2" class="slider-img">
+                <img src="images/slide3.jpg" alt="خلفية مطعم تكا بليت 3" class="slider-img">
             </div>
             <div class="hero-overlay"></div>
             <div class="hero-content">
@@ -253,6 +260,7 @@
             <div id="cart-items">
                 <p>سلتك فارغة حاليًا.</p>
             </div>
+
             <div class="order-options">
                 <h4>طريقة الاستلام:</h4>
                 <label>
@@ -262,18 +270,18 @@
                     <input type="radio" name="order-type" value="تيك أواي (استلام من الفرع)"> تيك أواي (استلام من الفرع)
                 </label>
             </div>
+
             <div class="order-notes">
                 <h4>إضافة ملاحظات:</h4>
                 <textarea id="order-notes-input" placeholder="مثال: بدون بصل، صوص إضافي..."></textarea>
             </div>
             <div class="modal-footer">
-                <h3>الإجمالي: <span id="total-price">0</span> ريال</h3>
-                <div class="payment-buttons">
-                    <button id="pay-online-btn" class="btn">💳 الدفع أونلاين</button>
-                    <button id="send-order-btn" class="btn whatsapp-btn">️➡️ إرسال الطلب عبر واتساب</button>
-                </div>
-                <div id="payment-status" class="status" style="display: none;"></div>
-            </div>
+    <div class="order-notes" style="margin-bottom: 20px;">
+        <h4>رقم الجوال للتواصل:</h4>
+        <input type="tel" id="customer-phone-input" placeholder="مثال: 0512345678" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: right; font-family: var(--font-main);">
+    </div>
+    <h3>الإجمالي: <span id="total-price">0</span> ريال</h3>
+    <button id="checkout-btn" class="btn">الدفع وإكمال الطلب</button> </div>
         </div>
     </div>
 
