@@ -2,7 +2,6 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
-    // 1. Authenticate the request
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
@@ -15,7 +14,6 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'Row ID is missing.' });
         }
 
-        // 2. Connect to Google Sheets
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -27,7 +25,6 @@ module.exports = async (req, res) => {
         const sheet = doc.sheetsByIndex[0];
         const rows = await sheet.getRows();
 
-        // 3. Find the row and update it
         const rowToUpdate = rows.find(row => row.offset === rowId);
         if (rowToUpdate) {
             rowToUpdate.set('تم التسليم', 'نعم');
