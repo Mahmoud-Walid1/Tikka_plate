@@ -11,11 +11,10 @@ export default async function handler(req, res) {
         const { amount, cart, phone } = req.body;
         const secretKey = process.env.MOYASAR_SECRET_KEY;
 
-        // وصف الطلب اللي هيظهر للعميل في صفحة الدفع
+        // وصف الطلب الذي سيظهر للعميل في صفحة الدفع
         const description = `طلب من مطعم تكا بليت. إجمالي: ${amount / 100} ريال.`;
         
-        // رابط صفحة الشكر اللي هيرجع لها العميل بعد الدفع بنجاح
-        // طريقة أفضل لضمان الرابط الصحيح سواء على Vercel أو جهازك
+        // رابط صفحة الشكر الذي سيعود إليه العميل بعد الدفع بنجاح
         const host = req.headers.host;
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
         const callbackUrl = `${protocol}://${host}/success.html`;
@@ -41,7 +40,7 @@ export default async function handler(req, res) {
         res.status(200).json({ paymentUrl: moyasarResponse.data.source.transaction_url });
 
     } catch (error) {
-        // طباعة الخطأ في Vercel logs عشان نعرف لو حصلت مشكلة
+        // طباعة الخطأ في Vercel logs لمعرفة المشكلة لو تكررت
         console.error('Moyasar API Error:', error.response ? error.response.data : error.message);
         res.status(500).json({ message: 'فشل في إنشاء عملية الدفع.' });
     }
