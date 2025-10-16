@@ -2,7 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
-    // 1. التحقق من كلمة السر
+    // 1. التحقق من كلمة المرور
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         // 3. البحث عن الصف وتحديثه
         const rowToUpdate = rows.find(row => row.offset === rowId);
         if (rowToUpdate) {
-            rowToUpdate.set('تم التسليم', 'نعم'); // هنا بنكتب "نعم" في الخلية الفاضية
+            rowToUpdate.set('تم التسليم', 'نعم');
             await rowToUpdate.save();
             res.status(200).json({ success: true });
         } else {
