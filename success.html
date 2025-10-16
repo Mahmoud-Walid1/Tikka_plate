@@ -6,51 +6,85 @@
     <title>تم الدفع بنجاح! - مطعم تكا بليت</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            color: #333;
-        }
-        .container {
-            background-color: #fff;
-            padding: 40px 60px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #1E5637; /* Secondary color from your CSS */
-            font-size: 2.5rem;
-        }
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: #C85A2B; /* Primary color from your CSS */
-            color: #fff;
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .btn:hover {
-            background-color: #a74b23;
-        }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; color: #333; }
+        .container { background-color: #fff; padding: 40px 60px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1E5637; font-size: 2.5rem; }
+        p { font-size: 1.2rem; margin-bottom: 30px; }
+        .btn { display: inline-block; background-color: #25D366; color: #fff; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: background-color 0.3s ease; font-size: 1.1rem; }
+        .btn:hover { background-color: #1EBE55; }
+        #loader { font-size: 1.5rem; color: #555; }
+        #confirmation-area, #error-area { display: none; } /* إخفاء المناطق مبدئيًا */
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>شكراً لك!</h1>
-        <p>تم استلام طلبك بنجاح وجاري تنفيذه، سيتم التواصل معك في أقرب وقت.</p>
-        <a href="/" class="btn">العودة للصفحة الرئيسية</a>
+        
+        <div id="loader">
+            <h1>لحظات من فضلك...</h1>
+            <p>جاري تأكيد حالة الدفع وتجهيز طلبك.</p>
+        </div>
+
+        <div id="confirmation-area">
+            <h1>شكراً لك! تم تأكيد طلبك</h1>
+            <p>طلبك الآن قيد التحضير. اضغط على الزر أدناه لإرسال تفاصيل الطلب مباشرة إلى المطبخ عبر واتساب.</p>
+            <a href="#" id="send-to-kitchen-btn" class="btn" target="_blank">✔️ إرسال الطلب للمطبخ الآن</a>
+        </div>
+        
+        <div id="error-area">
+            <h1>حدث خطأ</h1>
+            <p>لم نتمكن من تأكيد طلبك تلقائيًا. الرجاء التواصل معنا عبر واتساب لتأكيد الطلب.</p>
+             <a href="https://wa.me/966554242136" class="btn" target="_blank">تواصل معنا عبر واتساب</a>
+        </div>
+
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loader = document.getElementById('loader');
+            const confirmationArea = document.getElementById('confirmation-area');
+            const errorArea = document.getElementById('error-area');
+            const sendBtn = document.getElementById('send-to-kitchen-btn');
+
+            const restaurantNumber = '966554242136'; // رقم واتساب المطعم
+
+            // أولاً، نستخرج رقم الفاتورة من رابط الصفحة
+            const urlParams = new URLSearchParams(window.location.search);
+            const invoiceId = urlParams.get('id');
+
+            if (!invoiceId) {
+                loader.style.display = 'none';
+                errorArea.style.display = 'block';
+                return;
+            }
+
+            try {
+                // ثانيًا، نرسل رقم الفاتورة للسيرفر لنتأكد من الدفع
+                const response = await fetch('/api/confirm-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: invoiceId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    // ثالثًا، لو كل شيء تمام، نجهز رسالة الواتساب ونظهر زر الإرسال
+                    const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(data.message)}`;
+                    sendBtn.href = whatsappUrl;
+
+                    loader.style.display = 'none';
+                    confirmationArea.style.display = 'block';
+
+                } else {
+                    throw new Error(data.message || 'Confirmation failed');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                loader.style.display = 'none';
+                errorArea.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>
