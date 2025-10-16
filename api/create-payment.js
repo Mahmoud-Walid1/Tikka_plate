@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
             amount: Math.round(amount),
             currency: 'SAR',
             description: description,
-            success_url: successUrl,
+            success_url: successUrl, // هنا استخدمنا الرابط المعدل
             metadata: {
                 customer_phone: phone,
                 cart_items: JSON.stringify(cart)
