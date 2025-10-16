@@ -1,32 +1,14 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const crypto = require('crypto'); // نستدعي مكتبة التشفير
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
         return res.status(405).end();
     }
 
-    // <<< بداية خطوة التحقق من التوقيع >>>
-    const signature = req.headers['moyasar-signature'];
-    const webhookSecret = process.env.MOYASAR_WEBHOOK_SECRET;
-
-    if (!signature) {
-        return res.status(401).send('Signature is missing.');
-    }
-
-    const computedSignature = crypto
-        .createHmac('sha256', webhookSecret)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
-
-    if (signature !== computedSignature) {
-        return res.status(401).send('Signature is not valid.');
-    }
-    // <<< نهاية خطوة التحقق من التوقيع >>>
-
     try {
         const event = req.body;
 
+        // نستمع فقط للحدث اللي يهمنا: لما الفاتورة تتدفع
         if (event.type === 'invoice.paid') {
             const invoice = event.data;
             
@@ -36,9 +18,11 @@ module.exports = async (req, res) => {
             await doc.loadInfo();
             const sheet = doc.sheetsByIndex[0];
 
+            // (خطوة أمان) نتأكد إننا مسجلناش الطلب ده قبل كده
             const rows = await sheet.getRows();
             const alreadyExists = rows.some(row => row.get('رقم الفاتورة') === invoice.id);
 
+            // لو الطلب مش موجود، نسجله
             if (!alreadyExists) {
                 const cartItems = JSON.parse(invoice.metadata.cart_items);
                 let orderDetailsText = '';
