@@ -2,7 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
-    // 1. التحقق من كلمة المرور
+    // ... (بداية الملف والتحقق من كلمة السر زي ما هي) ...
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // 2. الاتصال بجوجل شيت
+        // ... (الاتصال بجوجل شيت زي ما هو) ...
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -22,7 +22,6 @@ module.exports = async (req, res) => {
         const sheet = doc.sheetsByIndex[0];
         const rows = await sheet.getRows();
 
-        // 3. تنظيم البيانات (مع إضافة قيم افتراضية لتجنب الأخطاء)
         const orders = rows.map(row => ({
             rowId: row.offset,
             InvoiceID: row.get('رقم الفاتورة') || 'غير متوفر',
@@ -31,15 +30,20 @@ module.exports = async (req, res) => {
             TotalAmount: row.get('الإجمالي المدفوع') || '0',
             Status: row.get('حالة الدفع') || 'غير معروف',
             OrderTime: row.get('وقت الطلب') || 'غير معروف',
-            Delivered: row.get('تم التسليم') || false // لو الخلية فاضية، نعتبره "لم يتم التسليم"
+            // <<< === بداية التعديل: هنتأكد لو الخلية مكتوب فيها "نعم" === >>>
+            Delivered: row.get('تم التسليم') === 'نعم'
+            // <<< === نهاية التعديل === >>>
         }));
         
-        // 4. ترتيب الطلبات
+        // ... (باقي الكود وترتيب الطلبات زي ما هو) ...
         const sortedOrders = orders.sort((a, b) => {
-            // التحويل لوقت صحيح للمقارنة
-            const dateA = new Date(a.OrderTime.split(',')[0].split('/').reverse().join('-') + 'T' + a.OrderTime.split(', ')[1]);
-            const dateB = new Date(b.OrderTime.split(',')[0].split('/').reverse().join('-') + 'T' + b.OrderTime.split(', ')[1]);
-            return dateB - dateA;
+             try {
+                const dateA = new Date(a.OrderTime.split(',')[0].split('/').reverse().join('-') + 'T' + a.OrderTime.split(', ')[1]);
+                const dateB = new Date(b.OrderTime.split(',')[0].split('/').reverse().join('-') + 'T' + b.OrderTime.split(', ')[1]);
+                return dateB - dateA;
+             } catch (e) {
+                return 0; // لو فيه مشكلة في صيغة التاريخ، منعملش ترتيب
+             }
         });
 
         res.status(200).json(sortedOrders);
