@@ -1,5 +1,8 @@
 const axios = require('axios');
+// <<< بداية التعديل: هنستدعي أدوات المصادقة الجديدة >>>
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { JWT } = require('google-auth-library');
+// <<< نهاية التعديل >>>
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
@@ -8,12 +11,11 @@ module.exports = async (req, res) => {
 
     try {
         const { id } = req.body;
-        if (!id || id === '{id}') { // هنتأكد إن الـ ID حقيقي
+        if (!id || id === '{id}') {
             return res.status(400).json({ message: 'Invoice ID is missing or invalid.' });
         }
 
         const secretKey = process.env.MOYASAR_SECRET_KEY;
-        
         const moyasarResponse = await axios.get(`https://api.moyasar.com/v1/invoices/${id}`, {
             auth: { username: secretKey }
         });
@@ -23,9 +25,16 @@ module.exports = async (req, res) => {
             return res.status(400).json({ message: 'Order is not paid yet.' });
         }
 
-        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID);
+        // <<< بداية التعديل: الطريقة الجديدة للمصادقة مع جوجل شيت >>>
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-        await doc.useServiceAccountAuth(creds);
+        const serviceAccountAuth = new JWT({
+            email: creds.client_email,
+            key: creds.private_key,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
+        // <<< نهاية التعديل: مش محتاجين السطر القديم بتاع useServiceAccountAuth >>>
+
         await doc.loadInfo();
         const sheet = doc.sheetsByIndex[0];
 
@@ -52,7 +61,7 @@ module.exports = async (req, res) => {
         res.status(200).json({ status: 'success', message: 'Order confirmed and saved.' });
 
     } catch (error) {
-        console.error('Confirmation Error:', error.response ? error.response.data : error);
+        console.error('Confirmation Error:', error);
         res.status(500).json({ message: 'Failed to confirm order details.' });
     }
 };
