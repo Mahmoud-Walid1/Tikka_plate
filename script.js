@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     // --- State for the cart ---
     let cart = [];
 
@@ -19,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartItemsContainer = document.getElementById('cart-items');
     const totalPriceEl = document.getElementById('total-price');
     const sendOrderBtn = document.getElementById('send-order-btn');
+    const payOnlineBtn = document.getElementById('pay-online-btn');
+    const paymentStatus = document.getElementById('payment-status');
     
     // 1. Mobile Navigation
     hamburger.addEventListener('click', () => {
@@ -69,19 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function setTheme(theme) {
         if (theme === 'dark') {
             body.classList.add('dark-mode');
-            themeCheckbox.checked = true;
+            if(themeCheckbox) themeCheckbox.checked = true;
         } else {
             body.classList.remove('dark-mode');
-            themeCheckbox.checked = false;
+            if(themeCheckbox) themeCheckbox.checked = false;
         }
         localStorage.setItem('theme', theme);
     }
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) { setTheme(savedTheme); }
-    
-    themeCheckbox.addEventListener('change', () => {
-        setTheme(themeCheckbox.checked ? 'dark' : 'light');
-    });
+    if(themeCheckbox){
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) { setTheme(savedTheme); }
+        themeCheckbox.addEventListener('change', () => {
+            setTheme(themeCheckbox.checked ? 'dark' : 'light');
+        });
+    }
 
     // 5. Interactive Menu for Mobile
     menuItems.forEach(item => {
@@ -174,24 +176,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 changeQuantity(name, action);
             }
         });
+        
+        // --- Moyasar Payment Logic ---
+        payOnlineBtn.addEventListener('click', async () => {
+             if (cart.length === 0) {
+                alert('سلتك فارغة!');
+                return;
+            }
 
+            payOnlineBtn.disabled = true;
+            paymentStatus.textContent = 'جاري تجهيز صفحة الدفع...';
+            paymentStatus.className = 'status';
+            paymentStatus.style.display = 'block';
+
+            const totalAmount = totalPriceEl.textContent;
+            const description = cart.map(item => `${item.quantity}x ${item.name}`).join(', ');
+
+            try {
+                const response = await fetch('/api/create-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: totalAmount, description: description }),
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message);
+                }
+                
+                // Redirect to Moyasar's payment page
+                window.location.href = data.payment_url;
+
+            } catch (error) {
+                paymentStatus.textContent = `فشل: ${error.message}`;
+                paymentStatus.className = 'status error';
+                payOnlineBtn.disabled = false;
+            }
+        });
+
+        // --- WhatsApp Order Logic ---
         sendOrderBtn.addEventListener('click', () => {
             if (cart.length === 0) {
                 alert('سلتك فارغة! الرجاء إضافة بعض المنتجات أولاً.');
                 return;
             }
 
-            // --- التعديلات الجديدة تبدأ هنا ---
-            // 1. قراءة طريقة الاستلام
             const orderType = document.querySelector('input[name="order-type"]:checked').value;
-            
-            // 2. قراءة الملاحظات
             const orderNotes = document.getElementById('order-notes-input').value;
 
             let invoice = `*فاتورة طلب جديد من موقع تكا بليت* 🔥\n\n`;
-            invoice += `*طريقة الاستلام: ${orderType}*\n\n`; // إضافة طريقة الاستلام للفاتورة
+            invoice += `*طريقة الاستلام: ${orderType}*\n\n`;
 
-            // إضافة الملاحظات فقط لو كانت مكتوبة
             if (orderNotes.trim() !== '') {
                 invoice += `*الملاحظات:*\n${orderNotes}\n\n`;
             }
@@ -204,8 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
             invoice += `-----------------------------------\n`;
             invoice += `*الإجمالي: ${totalPriceEl.textContent} ريال*\n\n`;
             invoice += `(هذا الطلب تم إرساله من الموقع الإلكتروني، نرجو تأكيده مع العميل)`;
-
-            // --- نهاية التعديلات ---
 
             const restaurantNumber = '966554242136';
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${restaurantNumber}&text=${encodeURIComponent(invoice)}`;
