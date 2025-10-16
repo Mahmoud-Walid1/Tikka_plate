@@ -2,142 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تم استلام طلبك! - مطعم تكا بليت</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>شكراً لك! - مطعم تكا بليت</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #C85A2B;
-            --secondary-color: #1E5637;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-        }
-        body { 
-            font-family: 'Tajawal', sans-serif; 
-            background-color: #f4f6f9; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center; 
-            color: #333; 
-        }
-        .container { 
-            background-color: #fff; 
-            padding: 40px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-        }
-        .icon {
-            margin: 0 auto 20px auto;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 40px;
-            color: #fff;
-        }
-        .success-icon {
-            background-color: var(--success-color);
-        }
-        .error-icon {
-            background-color: var(--error-color);
-        }
-        h1 { 
-            font-size: 2rem; 
-            margin-bottom: 15px;
-        }
-        p { 
-            font-size: 1.1rem; 
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 30px; 
-        }
-        .btn { 
-            display: inline-block; 
-            background-color: var(--primary-color); 
-            color: #fff; 
-            padding: 12px 30px; 
-            border-radius: 8px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            transition: background-color 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #a74b23;
-        }
-        #final-message, #error-area { 
-            display: none; 
-        }
+        :root { --primary-color: #C85A2B; --success-color: #28a745; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; color: #333; }
+        .container { background-color: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        .icon { margin: 0 auto 20px auto; width: 80px; height: 80px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #fff; background-color: var(--success-color); }
+        h1 { font-size: 2rem; margin-bottom: 15px; }
+        p { font-size: 1.1rem; color: #666; line-height: 1.6; margin-bottom: 30px; }
+        .btn { display: inline-block; background-color: var(--primary-color); color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="loader">
-            <h1>لحظات من فضلك...</h1>
-            <p>جاري تأكيد وتسجيل طلبك النهائي في نظامنا.</p>
-        </div>
-        <div id="final-message">
-            <div class="icon success-icon">✓</div>
-            <h1>شكراً لك! تم استلام طلبك</h1>
-            <p>طلبك الآن دخل نظامنا مباشرة وجاري تحضيره. لا حاجة لأي إجراء آخر من طرفك.</p>
-            <a href="/" class="btn">العودة للصفحة الرئيسية</a>
-        </div>
-        <div id="error-area">
-            <div class="icon error-icon">!</div>
-            <h1>حدث خطأ في التسجيل</h1>
-            <p>لم نتمكن من تسجيل طلبك تلقائيًا. نرجو العلم أن المبلغ تم دفعه بنجاح. يرجى التواصل معنا عبر واتساب لتأكيد الطلب يدويًا.</p>
-             <a href="https://wa.me/966554242136" class="btn" target="_blank">تواصل معنا عبر واتساب</a>
-        </div>
+        <div class="icon">✓</div>
+        <h1>شكراً لك! طلبك قيد التنفيذ</h1>
+        <p>لقد استلمنا دفعتك بنجاح، وسنقوم بتسجيل طلبك في نظامنا خلال لحظات. لا حاجة لأي إجراء آخر من طرفك.</p>
+        <a href="/" class="btn">العودة للصفحة الرئيسية</a>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const loader = document.getElementById('loader');
-            const finalMessage = document.getElementById('final-message');
-            const errorArea = document.getElementById('error-area');
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const invoiceId = urlParams.get('id');
-
-            // <<< === السطر الجديد والمهم لكشف المشكلة === >>>
-            alert("رقم الفاتورة اللي وصل للصفحة هو: " + invoiceId); 
-            // <<< ======================================== >>>
-
-            if (!invoiceId) {
-                loader.style.display = 'none';
-                errorArea.style.display = 'block';
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/confirm-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: invoiceId })
-                });
-
-                if (response.ok) {
-                    loader.style.display = 'none';
-                    finalMessage.style.display = 'block';
-                } else {
-                    throw new Error('Failed to save order');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                loader.style.display = 'none';
-                errorArea.style.display = 'block';
-            }
-        });
-    </script>
 </body>
 </html>
