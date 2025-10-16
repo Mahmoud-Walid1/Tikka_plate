@@ -9,14 +9,14 @@
         body { font-family: 'Tajawal', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
         h1, h2 { text-align: center; color: #1E5637; }
         #password-prompt { display: flex; justify-content: center; align-items: center; height: 80vh; }
-        #password-form { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px S10px rgba(0,0,0,0.1); text-align: center; }
+        #password-form { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
         #password-input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-left: 10px; font-family: 'Tajawal'; }
         #password-submit { padding: 10px 15px; background: #1E5637; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Tajawal';}
         #dashboard-content { display: none; }
         .tabs { text-align: center; margin-bottom: 20px; }
         .tab-btn { background: #e0e0e0; border: none; padding: 10px 20px; cursor: pointer; font-size: 1rem; border-radius: 5px; margin: 0 5px; font-family: 'Tajawal'; }
         .tab-btn.active { background: #1E5637; color: white; }
-        #orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         .order-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; border-right: 5px solid #C85A2B; transition: transform 0.2s; }
         .order-card.completed { border-right-color: #28a745; }
         .order-card:hover { transform: translateY(-5px); }
@@ -60,160 +60,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
             const passwordPrompt = document.getElementById('password-prompt');
             const passwordForm = document.getElementById('password-form');
             const dashboardContent = document.getElementById('dashboard-content');
             const passwordInput = document.getElementById('password-input');
             const passwordSubmit = document.getElementById('password-submit');
-            
             const newOrdersTab = document.getElementById('new-orders-tab');
             const archiveTab = document.getElementById('archive-tab');
             const newOrdersView = document.getElementById('new-orders-view');
             const archiveView = document.getElementById('archive-view');
-
             const notificationSound = document.getElementById('notification-sound');
+
+            // --- State ---
             let displayedOrderIds = new Set();
             let sessionPassword = '';
 
-            // --- Handlers ---
+            // --- Event Listeners ---
             passwordSubmit.addEventListener('click', main);
             passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
+            newOrdersTab.addEventListener('click', showNewOrdersView);
+            archiveTab.addEventListener('click', showArchiveView);
+            document.addEventListener('click', handleCompleteButtonClick);
 
-            newOrdersTab.addEventListener('click', () => {
+            // --- Functions ---
+            function showNewOrdersView() {
                 newOrdersView.style.display = 'block';
                 archiveView.style.display = 'none';
                 newOrdersTab.classList.add('active');
                 archiveTab.classList.remove('active');
-            });
+            }
 
-            archiveTab.addEventListener('click', () => {
+            function showArchiveView() {
                 newOrdersView.style.display = 'none';
                 archiveView.style.display = 'block';
                 newOrdersTab.classList.remove('active');
                 archiveTab.classList.add('active');
-            });
+            }
 
-            document.addEventListener('click', async (event) => {
+            async function handleCompleteButtonClick(event) {
                 if (event.target.classList.contains('complete-btn')) {
                     const button = event.target;
                     const rowId = button.dataset.rowId;
-                    button.disabled = true;
-                    button.textContent = 'جاري الحفظ...';
-
-                    await markOrderAsCompleted(rowId);
-                    await fetchAndRenderOrders(sessionPassword);
-                }
-            });
-
-            // --- Main Functions ---
-            async function main() {
-                const password = passwordInput.value;
-                if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
-                
-                sessionPassword = password;
-                passwordForm.innerHTML = '<p>جاري التحقق والتحميل...</p>';
-                
-                const result = await fetchAndRenderOrders(sessionPassword);
-
-                if (result.success) {
-                    passwordPrompt.style.display = 'none';
-                    dashboardContent.style.display = 'block';
-                    
-                    // Populate initial order IDs without playing sound
-                    result.orders.forEach(order => { if (!order.Delivered) displayedOrderIds.add(order.rowId); });
-
-                    setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
-                } else {
-                     passwordForm.innerHTML = `<p style="color: red;">فشل تحميل البيانات. السبب: ${result.error}</p><p>تأكد من الصلاحيات وأسماء الأعمدة في جوجل شيت.</p>`;
-                }
-            }
-
-            async function fetchAndRenderOrders(password) {
-                try {
-                    const response = await fetch('/api/get-orders', { headers: { 'Authorization': password } });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.details || 'كلمة المرور غير صحيحة.');
-                    }
-                    
-                    const orders = await response.json();
-                    
-                    const newOrdersGrid = document.getElementById('new-orders-grid');
-                    const archiveGrid = document.getElementById('archive-grid');
-                    newOrdersGrid.innerHTML = '';
-                    archiveGrid.innerHTML = '';
-
-                    let newOrdersCount = 0;
-                    let archiveCount = 0;
-                    let newOrderFound = false;
-                    
-                    for(const order of orders) {
-                        const card = createOrderCard(order);
-                        if (!order.Delivered) {
-                            newOrdersGrid.appendChild(card);
-                            newOrdersCount++;
-                            if (!displayedOrderIds.has(order.rowId)) {
-                                newOrderFound = true;
-                                displayedOrderIds.add(order.rowId);
-                            }
-                        } else {
-                            archiveGrid.appendChild(card);
-                            archiveCount++;
-                        }
-                    }
-
-                    document.getElementById('new-orders-count').textContent = newOrdersCount;
-                    document.getElementById('archive-count').textContent = archiveCount;
-
-                    if (newOrdersCount === 0) newOrdersGrid.innerHTML = '<h2>لا توجد طلبات جديدة حاليًا...</h2>';
-                    if (archiveCount === 0) archiveGrid.innerHTML = '<h2>الأرشيف فارغ...</h2>';
-                    
-                    if (newOrderFound && document.hidden === false) {
-                         notificationSound.play().catch(e => {});
-                    }
-                    
-                    return { success: true, orders: orders };
-                } catch (error) {
-                    console.error('Failed to fetch orders:', error);
-                    return { success: false, error: error.message };
-                }
-            }
-
-            async function markOrderAsCompleted(rowId) {
-                try {
-                    const response = await fetch('/api/update-order-status', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': sessionPassword 
-                        },
-                        body: JSON.stringify({ rowId: parseInt(rowId) })
-                    });
-                    return response.ok;
-                } catch (error) {
-                    console.error("Failed to update status", error);
-                    return false;
-                }
-            }
-
-            function createOrderCard(order) {
-                const card = document.createElement('div');
-                card.className = 'order-card';
-                if(order.Delivered) card.classList.add('completed');
-
-                card.innerHTML = `
-                    <h3>فاتورة: ${order.InvoiceID}</h3>
-                    <p><strong>وقت الطلب:</strong> ${order.OrderTime}</p>
-                    <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone}">${order.CustomerPhone}</a></p>
-                    <p><strong>الإجمالي:</strong> ${order.TotalAmount} ريال</p>
-                    <p><strong>التفاصيل:</strong></p>
-                    <pre>${order.OrderDetails}</pre>
-                    ${!order.Delivered ? `<button class="complete-btn" data-row-id="${order.rowId}">✓ تم التسليم</button>` : ''}
-                `;
-                return card;
-            }
-        });
-    </script>
-</body>
-</html>
+                    button.disabled =
