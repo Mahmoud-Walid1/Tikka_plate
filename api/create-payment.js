@@ -10,19 +10,17 @@ module.exports = async (req, res) => {
         const secretKey = process.env.MOYASAR_SECRET_KEY;
 
         const description = `طلب من مطعم تكا بليت. رقم التواصل: ${phone}`;
-        
         const host = req.headers.host;
         const protocol = host.startsWith('localhost') ? 'http' : 'https';
 
-        // <<< === بداية التعديل المهم: أضفنا ?id={id} في آخر الرابط === >>>
-       const successUrl = `${protocol}://${host}/success.html?id={id}`;
-        // <<< === نهاية التعديل المهم === >>>
+        // <<< === التعديل: رابط نجاح بسيط من غير أي إضافات === >>>
+        const successUrl = `${protocol}://${host}/success.html`;
 
         const moyasarResponse = await axios.post('https://api.moyasar.com/v1/invoices', {
             amount: Math.round(amount),
             currency: 'SAR',
             description: description,
-            success_url: successUrl, // هنا استخدمنا الرابط المعدل
+            success_url: successUrl,
             metadata: {
                 customer_phone: phone,
                 cart_items: JSON.stringify(cart)
