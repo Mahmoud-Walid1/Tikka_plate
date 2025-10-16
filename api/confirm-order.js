@@ -47,7 +47,8 @@ module.exports = async (req, res) => {
         res.status(200).json({ status: 'success', message: 'Order confirmed and saved to Google Sheets.' });
 
     } catch (error) {
-        console.error('Confirmation Error:', error);
+        // السطر ده هو اللي بيطبعلنا الأخطاء بالتفصيل في Vercel logs
+        console.error('Confirmation Error:', error.response ? error.response.data : error);
         res.status(500).json({ message: 'Failed to confirm order details.' });
     }
 };
