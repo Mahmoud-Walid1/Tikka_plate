@@ -276,12 +276,17 @@
                 <textarea id="order-notes-input" placeholder="مثال: بدون بصل، صوص إضافي..."></textarea>
             </div>
             <div class="modal-footer">
-    <div class="order-notes" style="margin-bottom: 20px;">
-        <h4>رقم الجوال للتواصل:</h4>
-        <input type="tel" id="customer-phone-input" placeholder="مثال: 0512345678" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: right; font-family: var(--font-main);">
-    </div>
-    <h3>الإجمالي: <span id="total-price">0</span> ريال</h3>
-    <button id="checkout-btn" class="btn">الدفع وإكمال الطلب</button> </div>
+                <div class="order-notes" style="margin-bottom: 20px;">
+                    <h4>رقم الجوال للتواصل (مطلوب):</h4>
+                    <input type="tel" id="customer-phone-input" placeholder="مثال: 0512345678" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: right; font-family: var(--font-main);">
+                </div>
+                <h3>الإجمالي: <span id="total-price">0</span> ريال</h3>
+
+                <div class="checkout-options" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                     <button id="checkout-btn" class="btn" style="background-color: var(--secondary-color); flex: 1;">💳 الدفع بالبطاقة</button>
+                     <button id="send-order-btn" class="btn" style="background-color: #25D366; flex: 1;">🗨️ الطلب عبر واتساب</button>
+                </div>
+                </div>
         </div>
     </div>
 
