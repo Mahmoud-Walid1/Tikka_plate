@@ -2,13 +2,15 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
+    // 1. التحقق من كلمة المرور
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
     if (!providedPassword || providedPassword !== correctPassword) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized', details: 'Invalid or missing password.' });
     }
 
     try {
+        // 2. الاتصال بجوجل شيت
         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
         const serviceAccountAuth = new JWT({
             email: creds.client_email,
@@ -16,19 +18,16 @@ module.exports = async (req, res) => {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
         const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        await doc.loadInfo();
-        const sheet = doc.sheetsByIndex[0];
         
-        const requiredHeaders = ['رقم الفاتورة', 'تم التسليم'];
-        const actualHeaders = sheet.headerValues;
-        for (const header of requiredHeaders) {
-            if (!actualHeaders.includes(header)) {
-                throw new Error(`Column "${header}" not found in Google Sheet.`);
-            }
-        }
+        // <<< === بداية التعديل المهم: هنا نتأكد من تحميل كل حاجة أولاً === >>>
+        await doc.loadInfo(); 
+        const sheet = doc.sheetsByIndex[0]; 
+        await sheet.loadHeaderRow(); // هذا السطر يضمن تحميل أسماء الأعمدة
+        // <<< === نهاية التعديل المهم === >>>
 
         const rows = await sheet.getRows();
 
+        // 3. تنظيم البيانات
         const orders = rows
             .filter(row => row.get('رقم الفاتورة'))
             .map(row => ({
@@ -42,6 +41,7 @@ module.exports = async (req, res) => {
                 Delivered: row.get('تم التسليم') === 'نعم'
             }));
         
+        // 4. ترتيب الطلبات
         const sortedOrders = orders.sort((a, b) => {
              try {
                 const dateA = new Date(a.OrderTime.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3'));
