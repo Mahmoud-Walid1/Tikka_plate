@@ -81,38 +81,54 @@
             passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
             newOrdersTab.addEventListener('click', showNewOrdersView);
             archiveTab.addEventListener('click', showArchiveView);
-            // <<< === بداية التعديل: هنستخدم Event Delegation بطريقة أضمن === >>>
+            // <<< === بداية التعديل: استخدام Event Delegation === >>>
             dashboardContent.addEventListener('click', handleCompleteButtonClick);
             // <<< === نهاية التعديل === >>>
 
             // --- Functions ---
-            function showNewOrdersView() { /* ... (لا تغيير هنا) ... */ }
-            function showArchiveView() { /* ... (لا تغيير هنا) ... */ }
+            function showNewOrdersView() {
+                newOrdersView.style.display = 'block';
+                archiveView.style.display = 'none';
+                newOrdersTab.classList.add('active');
+                archiveTab.classList.remove('active');
+            }
+
+            function showArchiveView() {
+                newOrdersView.style.display = 'none';
+                archiveView.style.display = 'block';
+                newOrdersTab.classList.remove('active');
+                archiveTab.classList.add('active');
+            }
 
             async function handleCompleteButtonClick(event) {
-                if (event.target.classList.contains('complete-btn')) {
-                    const button = event.target;
-                    // <<< === بداية التعديل: نتأكد من قراءة رقم الصف بشكل صحيح === >>>
-                    const rowId = button.dataset.rowId;
-                    console.log("Attempting to complete rowId:", rowId); // للتأكد إن الرقم بيتقرا صح
-                    if (rowId === undefined || rowId === null) {
-                         alert('خطأ: لم يتم العثور على رقم الطلب. حاول تحديث الصفحة.');
-                         return;
-                    }
-                    // <<< === نهاية التعديل === >>>
+                // التأكد من أن الضغطة كانت على الزر الصحيح
+                if (!event.target.classList.contains('complete-btn')) return;
 
-                    button.disabled = true;
-                    button.textContent = 'جاري الحفظ...';
+                const button = event.target;
+                // <<< === بداية التعديل: التأكد من قراءة وتحويل الرقم === >>>
+                const rowIdString = button.dataset.rowId;
+                console.log("Button clicked for rowId string:", rowIdString); // نطبع الرقم كنص
 
-                    const success = await markOrderAsCompleted(parseInt(rowId)); // نبعت الرقم الصحيح
-                    if (!success) {
-                        alert('فشل تحديث حالة الطلب. تحقق من الـ Logs.');
-                        button.disabled = false;
-                        button.textContent = '✓ تم التسليم';
-                    } else {
-                         // نحدث القائمة فورًا بعد النجاح
-                         await fetchAndRenderOrders(sessionPassword);
-                    }
+                // تحويل النص لرقم والتأكد إنه رقم صحيح
+                const rowIdInt = parseInt(rowIdString, 10);
+                if (isNaN(rowIdInt)) {
+                    console.error("Failed to parse rowId:", rowIdString);
+                    alert('خطأ: لم يتم العثور على رقم الطلب. حاول تحديث الصفحة.');
+                    return;
+                }
+                console.log("Parsed rowId integer:", rowIdInt); // نطبع الرقم الصحيح
+                // <<< === نهاية التعديل === >>>
+
+                button.disabled = true;
+                button.textContent = 'جاري الحفظ...';
+
+                const success = await markOrderAsCompleted(rowIdInt); // نبعت الرقم الصحيح
+                if (!success) {
+                    alert('فشل تحديث حالة الطلب. تحقق من Logs السيرفر.'); // رسالة خطأ أوضح
+                    button.disabled = false;
+                    button.textContent = '✓ تم التسليم';
+                } else {
+                    await fetchAndRenderOrders(sessionPassword); // نحدث القائمة فورًا
                 }
             }
 
@@ -120,7 +136,7 @@
 
             async function fetchAndRenderOrders(password) { /* ... (لا تغيير هنا) ... */ }
 
-            async function markOrderAsCompleted(rowIdInt) { // غيرنا اسم المتغير للتوضيح
+            async function markOrderAsCompleted(rowIdInt) {
                 try {
                     console.log("Sending rowId to server:", rowIdInt); // نتأكد من الرقم قبل الإرسال
                     const response = await fetch('/api/update-order-status', {
@@ -132,7 +148,6 @@
                         body: JSON.stringify({ rowId: rowIdInt }) // نبعت الرقم الصحيح
                     });
                     if (!response.ok) {
-                        // لو السيرفر رجع خطأ، نطبع التفاصيل
                         const errorData = await response.json();
                         console.error("Server error on update:", errorData);
                     }
@@ -144,21 +159,7 @@
             }
 
             function createOrderCard(order) { /* ... (لا تغيير هنا) ... */ }
-
-            // --- الكود الخاص بعرض وإخفاء الأقسام ---
-            function showNewOrdersView() {
-                newOrdersView.style.display = 'block';
-                archiveView.style.display = 'none';
-                newOrdersTab.classList.add('active');
-                archiveTab.classList.remove('active');
-            }
-            function showArchiveView() {
-                newOrdersView.style.display = 'none';
-                archiveView.style.display = 'block';
-                newOrdersTab.classList.remove('active');
-                archiveTab.classList.add('active');
-            }
-            // --- الكود الخاص بإنشاء كارتة الطلب ---
+             // --- الكود الخاص بإنشاء كارتة الطلب ---
              function createOrderCard(order) {
                 const card = document.createElement('div');
                 card.className = 'order-card';
@@ -179,14 +180,14 @@
             async function fetchAndRenderOrders(password) {
                 try {
                     const response = await fetch('/api/get-orders', { headers: { 'Authorization': password } });
-                    
+
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.details || 'كلمة المرور غير صحيحة.');
                     }
-                    
+
                     const orders = await response.json();
-                    
+
                     const newOrdersGrid = document.getElementById('new-orders-grid');
                     const archiveGrid = document.getElementById('archive-grid');
                     newOrdersGrid.innerHTML = '';
@@ -195,7 +196,7 @@
                     let newOrdersCount = 0;
                     let archiveCount = 0;
                     let newOrderFound = false;
-                    
+
                     for(const order of orders) {
                         const card = createOrderCard(order);
                         if (!order.Delivered) {
@@ -216,11 +217,11 @@
 
                     if (newOrdersCount === 0) newOrdersGrid.innerHTML = '<h2>لا توجد طلبات جديدة حاليًا...</h2>';
                     if (archiveCount === 0) archiveGrid.innerHTML = '<h2>الأرشيف فارغ...</h2>';
-                    
+
                     if (newOrderFound && document.hidden === false) {
                          notificationSound.play().catch(e => {});
                     }
-                    
+
                     return { success: true, orders: orders };
                 } catch (error) {
                     console.error('Failed to fetch orders:', error);
@@ -231,16 +232,16 @@
             async function main() {
                 const password = passwordInput.value;
                 if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
-                
+
                 sessionPassword = password;
                 passwordForm.innerHTML = '<p>جاري التحقق والتحميل...</p>';
-                
+
                 const result = await fetchAndRenderOrders(sessionPassword);
 
                 if (result.success) {
                     passwordPrompt.style.display = 'none';
                     dashboardContent.style.display = 'block';
-                    
+
                     result.orders.forEach(order => { if (!order.Delivered) displayedOrderIds.add(order.rowId); });
                     setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
                 } else {
