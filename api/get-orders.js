@@ -2,34 +2,27 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
-    // 1. التحقق من كلمة المرور
+    // ... (التحقق من كلمة السر)
     const providedPassword = req.headers.authorization;
     const correctPassword = process.env.DASHBOARD_PASSWORD;
-    if (!providedPassword || providedPassword !== correctPassword) {
-        return res.status(401).json({ error: 'Unauthorized', details: 'Invalid or missing password.' });
+     if (!providedPassword || providedPassword !== correctPassword) {
+        return res.status(401).json({ error: 'Unauthorized' });
     }
-
+    
     try {
-        // 2. الاتصال بجوجل شيت
-        const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-        const serviceAccountAuth = new JWT({
-            email: creds.client_email,
-            key: creds.private_key,
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        });
-        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        
-        // <<< === بداية التعديل المهم: هنا نتأكد من تحميل كل حاجة أولاً === >>>
-        await doc.loadInfo(); 
-        const sheet = doc.sheetsByIndex[0]; 
-        await sheet.loadHeaderRow(); // هذا السطر يضمن تحميل أسماء الأعمدة
-        // <<< === نهاية التعديل المهم === >>>
+        // ... (الاتصال بجوجل شيت)
+         const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+         const serviceAccountAuth = new JWT({ /* ... */ });
+         const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
+         
+         await doc.loadInfo(); 
+         const sheet = doc.sheetsByIndex[0]; 
+         await sheet.loadHeaderRow(); // التأكد من تحميل الأعمدة
 
         const rows = await sheet.getRows();
 
-        // 3. تنظيم البيانات
         const orders = rows
-            .filter(row => row.get('رقم الفاتورة'))
+            .filter(row => row.get('رقم الفاتورة')) // نتجاهل السطور الفاضية
             .map(row => ({
                 rowId: row.offset,
                 InvoiceID: row.get('رقم الفاتورة') || 'N/A',
@@ -38,17 +31,11 @@ module.exports = async (req, res) => {
                 TotalAmount: row.get('الإجمالي المدفوع') || '0',
                 Status: row.get('حالة الدفع') || 'N/A',
                 OrderTime: row.get('وقت الطلب') || 'N/A',
-                Delivered: row.get('تم التسليم') === 'نعم'
+                Delivered: row.get('تم التسليم') === 'نعم' // يعتبر "تم التسليم" فقط لو مكتوب "نعم"
             }));
         
-        // 4. ترتيب الطلبات
-        const sortedOrders = orders.sort((a, b) => {
-             try {
-                const dateA = new Date(a.OrderTime.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3'));
-                const dateB = new Date(b.OrderTime.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3'));
-                return dateB - dateA;
-             } catch (e) { return 0; }
-        });
+        // ... (ترتيب الطلبات)
+        const sortedOrders = orders.sort((a, b) => { /* ... */ });
 
         res.status(200).json(sortedOrders);
     } catch (error) {
