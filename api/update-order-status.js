@@ -23,9 +23,9 @@ module.exports = async (req, res) => {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
         const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        
-        await doc.loadInfo(); 
-        const sheet = doc.sheetsByIndex[0]; 
+
+        await doc.loadInfo();
+        const sheet = doc.sheetsByIndex[0];
         await sheet.loadHeaderRow(); // نتأكد من تحميل الأعمدة
 
         const rows = await sheet.getRows();
@@ -37,10 +37,12 @@ module.exports = async (req, res) => {
             await rowToUpdate.save();
             res.status(200).json({ success: true });
         } else {
+            // Added more specific logging for row not found
+            console.warn(`Row with offset ${rowId} not found in sheet.`);
             res.status(404).json({ error: 'Row not found.' });
         }
     } catch (error) {
-        console.error('Update Status Error:', error);
+        console.error('Update Status Error:', error); // Log the detailed error
         res.status(500).json({ error: 'Failed to update order status.', details: error.message });
     }
 };
