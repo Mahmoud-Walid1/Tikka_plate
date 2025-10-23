@@ -1,118 +1,56 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الطلبات - تكا بليت</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* ... (كل الـ style زي ما هو) ... */
-    </style>
-</head>
-<body>
-    <div id="dashboard-content">
-        </div>
-    <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { JWT } = require('google-auth-library');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements & State (زي ما هما) ---
-            // ...
-            let sessionPassword = '';
+module.exports = async (req, res) => {
+    // 1. التحقق من كلمة المرور (زي ما هو)
+    const providedPassword = req.headers.authorization;
+    const correctPassword = process.env.DASHBOARD_PASSWORD;
+     if (!providedPassword || providedPassword !== correctPassword) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-            // --- Event Listeners (زي ما هما) ---
-            // ...
-            dashboardContent.addEventListener('click', handleCompleteButtonClick);
+    try {
+        // <<< === بداية التعديل: هنستقبل رقم الفاتورة === >>>
+        const { invoiceId } = req.body;
+        if (!invoiceId) {
+            return res.status(400).json({ error: 'Invoice ID is missing.' });
+        }
+        // <<< === نهاية التعديل === >>>
 
-            // --- Functions ---
-            // ... (showNewOrdersView, showArchiveView زي ما هما) ...
+        // 2. الاتصال بجوجل شيت (زي ما هو)
+        const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+        const serviceAccountAuth = new JWT({ /* ... */ });
+        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
+        
+        await doc.loadInfo(); 
+        const sheet = doc.sheetsByIndex[0]; 
+        await sheet.loadHeaderRow();
 
-            async function handleCompleteButtonClick(event) {
-                if (!event.target.classList.contains('complete-btn')) return;
+        const rows = await sheet.getRows();
 
-                const button = event.target;
-                // <<< === بداية التعديل: هنقرأ رقم الفاتورة من الزرار === >>>
-                const invoiceId = button.dataset.invoiceId;
-                console.log("Button clicked, trying to get invoiceId:", invoiceId);
+        // <<< === بداية التعديل: هندور برقم الفاتورة === >>>
+        const rowToUpdate = rows.find(row => row.get('رقم الفاتورة') === invoiceId);
+        // <<< === نهاية التعديل === >>>
 
-                if (!invoiceId) {
-                    console.error("data-invoice-id attribute is missing or empty.");
-                    alert('خطأ: لم يتم العثور على رقم فاتورة الطلب. حاول تحديث الصفحة.');
-                    return;
-                }
-                // <<< === نهاية التعديل === >>>
+        if (rowToUpdate) {
+            rowToUpdate.set('تم التسليم', 'نعم');
+            await rowToUpdate.save();
+            res.status(200).json({ success: true });
+        } else {
+            console.warn(`Invoice ID ${invoiceId} not found in sheet.`); // رسالة أوضح للـ Logs
+            res.status(404).json({ error: 'Invoice ID not found.' });
+        }
+    } catch (error) {
+        console.error('Update Status Error:', error);
+        res.status(500).json({ error: 'Failed to update order status.', details: error.message });
+    }
+};
 
-                button.disabled = true;
-                button.textContent = 'جاري الحفظ...';
-
-                // <<< === بداية التعديل: هنبعت رقم الفاتورة للسيرفر === >>>
-                const success = await markOrderAsCompleted(invoiceId);
-                // <<< === نهاية التعديل === >>>
-                if (!success) {
-                    alert('فشل تحديث حالة الطلب. تحقق من Logs السيرفر.');
-                    button.disabled = false;
-                    button.textContent = '✓ تم التسليم';
-                } else {
-                    await fetchAndRenderOrders(sessionPassword);
-                }
-            }
-
-            // ... (main, fetchAndRenderOrders زي ما هما) ...
-
-            async function markOrderAsCompleted(invoiceId) { // غيرنا المتغير اللي بنستقبله
-                try {
-                    console.log("Sending invoiceId to server:", invoiceId);
-                    const response = await fetch('/api/update-order-status', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': sessionPassword
-                        },
-                         // <<< === بداية التعديل: بنبعت invoiceId بدل rowId === >>>
-                        body: JSON.stringify({ invoiceId: invoiceId })
-                        // <<< === نهاية التعديل === >>>
-                    });
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error("Server error on update:", errorData);
-                    }
-                    return response.ok;
-                } catch (error) {
-                    console.error("Network error on update:", error);
-                    return false;
-                }
-            }
-
-            function createOrderCard(order) {
-                const card = document.createElement('div');
-                card.className = 'order-card';
-                if(order.Delivered) card.classList.add('completed');
-
-                 // <<< === بداية التعديل: هنخزن رقم الفاتورة في الزرار === >>>
-                const invoiceIdAttr = (order.InvoiceID && order.InvoiceID !== 'N/A')
-                                    ? `data-invoice-id="${order.InvoiceID}"`
-                                    : '';
-                // <<< === نهاية التعديل === >>>
-
-                const completeButtonHTML = !order.Delivered && invoiceIdAttr
-                    ? `<button class="complete-btn" ${invoiceIdAttr}>✓ تم التسليم</button>`
-                    : (order.Delivered ? '<p style="color: green; font-weight: bold;">تم التسليم</p>' : '');
-
-                card.innerHTML = `
-                    <h3>فاتورة: ${order.InvoiceID}</h3>
-                    <p><strong>وقت الطلب:</strong> ${order.OrderTime}</p>
-                    <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone}">${order.CustomerPhone}</a></p>
-                    <p><strong>الإجمالي:</strong> ${order.TotalAmount} ريال</p>
-                    <p><strong>التفاصيل:</strong></p>
-                    <pre>${order.OrderDetails}</pre>
-                    ${completeButtonHTML}
-                `;
-                return card;
-            }
-
-             // --- باقي الدوال المساعدة (زي ما هي) ---
-             // ... (showNewOrdersView, showArchiveView, fetchAndRenderOrders, main) ...
-        });
-    </script>
-</body>
-</html>
+// --- JWT setup ---
+const setupAuth = (creds) => {
+ return new JWT({
+    email: creds.client_email,
+    key: creds.private_key,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+ });
+}
