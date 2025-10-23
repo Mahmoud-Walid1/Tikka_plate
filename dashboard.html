@@ -30,7 +30,7 @@
     </style>
 </head>
 <body>
-    
+
     <div id="password-prompt">
         <div id="password-form">
             <h2>لوحة التحكم محمية</h2>
@@ -42,7 +42,7 @@
 
     <div id="dashboard-content">
         <h1>📋 طلبات تكا بليت</h1>
-        
+
         <div class="tabs">
             <button class="tab-btn active" id="new-orders-tab">طلبات جديدة (<span id="new-orders-count">0</span>)</button>
             <button class="tab-btn" id="archive-tab">الأرشيف (<span id="archive-count">0</span>)</button>
@@ -81,60 +81,101 @@
             passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
             newOrdersTab.addEventListener('click', showNewOrdersView);
             archiveTab.addEventListener('click', showArchiveView);
-            document.addEventListener('click', handleCompleteButtonClick);
+            // <<< === بداية التعديل: هنستخدم Event Delegation بطريقة أضمن === >>>
+            dashboardContent.addEventListener('click', handleCompleteButtonClick);
+            // <<< === نهاية التعديل === >>>
 
             // --- Functions ---
+            function showNewOrdersView() { /* ... (لا تغيير هنا) ... */ }
+            function showArchiveView() { /* ... (لا تغيير هنا) ... */ }
+
+            async function handleCompleteButtonClick(event) {
+                if (event.target.classList.contains('complete-btn')) {
+                    const button = event.target;
+                    // <<< === بداية التعديل: نتأكد من قراءة رقم الصف بشكل صحيح === >>>
+                    const rowId = button.dataset.rowId;
+                    console.log("Attempting to complete rowId:", rowId); // للتأكد إن الرقم بيتقرا صح
+                    if (rowId === undefined || rowId === null) {
+                         alert('خطأ: لم يتم العثور على رقم الطلب. حاول تحديث الصفحة.');
+                         return;
+                    }
+                    // <<< === نهاية التعديل === >>>
+
+                    button.disabled = true;
+                    button.textContent = 'جاري الحفظ...';
+
+                    const success = await markOrderAsCompleted(parseInt(rowId)); // نبعت الرقم الصحيح
+                    if (!success) {
+                        alert('فشل تحديث حالة الطلب. تحقق من الـ Logs.');
+                        button.disabled = false;
+                        button.textContent = '✓ تم التسليم';
+                    } else {
+                         // نحدث القائمة فورًا بعد النجاح
+                         await fetchAndRenderOrders(sessionPassword);
+                    }
+                }
+            }
+
+            async function main() { /* ... (لا تغيير هنا) ... */ }
+
+            async function fetchAndRenderOrders(password) { /* ... (لا تغيير هنا) ... */ }
+
+            async function markOrderAsCompleted(rowIdInt) { // غيرنا اسم المتغير للتوضيح
+                try {
+                    console.log("Sending rowId to server:", rowIdInt); // نتأكد من الرقم قبل الإرسال
+                    const response = await fetch('/api/update-order-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': sessionPassword
+                        },
+                        body: JSON.stringify({ rowId: rowIdInt }) // نبعت الرقم الصحيح
+                    });
+                    if (!response.ok) {
+                        // لو السيرفر رجع خطأ، نطبع التفاصيل
+                        const errorData = await response.json();
+                        console.error("Server error on update:", errorData);
+                    }
+                    return response.ok;
+                } catch (error) {
+                    console.error("Network error on update:", error);
+                    return false;
+                }
+            }
+
+            function createOrderCard(order) { /* ... (لا تغيير هنا) ... */ }
+
+            // --- الكود الخاص بعرض وإخفاء الأقسام ---
             function showNewOrdersView() {
                 newOrdersView.style.display = 'block';
                 archiveView.style.display = 'none';
                 newOrdersTab.classList.add('active');
                 archiveTab.classList.remove('active');
             }
-
             function showArchiveView() {
                 newOrdersView.style.display = 'none';
                 archiveView.style.display = 'block';
                 newOrdersTab.classList.remove('active');
                 archiveTab.classList.add('active');
             }
+            // --- الكود الخاص بإنشاء كارتة الطلب ---
+             function createOrderCard(order) {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                if(order.Delivered) card.classList.add('completed');
 
-            async function handleCompleteButtonClick(event) {
-                if (event.target.classList.contains('complete-btn')) {
-                    const button = event.target;
-                    const rowId = button.dataset.rowId;
-                    button.disabled = true;
-                    button.textContent = 'جاري الحفظ...';
-
-                    const success = await markOrderAsCompleted(rowId);
-                    if (!success) {
-                        alert('فشل تحديث حالة الطلب. حاول مرة أخرى.');
-                        button.disabled = false;
-                        button.textContent = '✓ تم التسليم';
-                    }
-                    await fetchAndRenderOrders(sessionPassword);
-                }
+                card.innerHTML = `
+                    <h3>فاتورة: ${order.InvoiceID}</h3>
+                    <p><strong>وقت الطلب:</strong> ${order.OrderTime}</p>
+                    <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone}">${order.CustomerPhone}</a></p>
+                    <p><strong>الإجمالي:</strong> ${order.TotalAmount} ريال</p>
+                    <p><strong>التفاصيل:</strong></p>
+                    <pre>${order.OrderDetails}</pre>
+                    ${!order.Delivered ? `<button class="complete-btn" data-row-id="${order.rowId}">✓ تم التسليم</button>` : '<p style="color: green; font-weight: bold;">تم التسليم</p>'}
+                `;
+                return card;
             }
-
-            async function main() {
-                const password = passwordInput.value;
-                if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
-                
-                sessionPassword = password;
-                passwordForm.innerHTML = '<p>جاري التحقق والتحميل...</p>';
-                
-                const result = await fetchAndRenderOrders(sessionPassword);
-
-                if (result.success) {
-                    passwordPrompt.style.display = 'none';
-                    dashboardContent.style.display = 'block';
-                    
-                    result.orders.forEach(order => { if (!order.Delivered) displayedOrderIds.add(order.rowId); });
-                    setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
-                } else {
-                     passwordForm.innerHTML = `<p style="color: red;">فشل تحميل البيانات. السبب: ${result.error}</p><p>تأكد من الصلاحيات وأسماء الأعمدة في جوجل شيت.</p>`;
-                }
-            }
-
+            // --- الكود الخاص بجلب وعرض الطلبات ---
             async function fetchAndRenderOrders(password) {
                 try {
                     const response = await fetch('/api/get-orders', { headers: { 'Authorization': password } });
@@ -186,39 +227,25 @@
                     return { success: false, error: error.message };
                 }
             }
+             // --- الكود الخاص بالدخول الرئيسي ---
+            async function main() {
+                const password = passwordInput.value;
+                if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
+                
+                sessionPassword = password;
+                passwordForm.innerHTML = '<p>جاري التحقق والتحميل...</p>';
+                
+                const result = await fetchAndRenderOrders(sessionPassword);
 
-            async function markOrderAsCompleted(rowId) {
-                try {
-                    const response = await fetch('/api/update-order-status', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': sessionPassword 
-                        },
-                        body: JSON.stringify({ rowId: parseInt(rowId) })
-                    });
-                    return response.ok;
-                } catch (error) {
-                    console.error("Failed to update status", error);
-                    return false;
+                if (result.success) {
+                    passwordPrompt.style.display = 'none';
+                    dashboardContent.style.display = 'block';
+                    
+                    result.orders.forEach(order => { if (!order.Delivered) displayedOrderIds.add(order.rowId); });
+                    setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
+                } else {
+                     passwordForm.innerHTML = `<p style="color: red;">فشل تحميل البيانات. السبب: ${result.error}</p><p>تأكد من الصلاحيات وأسماء الأعمدة في جوجل شيت.</p>`;
                 }
-            }
-
-            function createOrderCard(order) {
-                const card = document.createElement('div');
-                card.className = 'order-card';
-                if(order.Delivered) card.classList.add('completed');
-
-                card.innerHTML = `
-                    <h3>فاتورة: ${order.InvoiceID}</h3>
-                    <p><strong>وقت الطلب:</strong> ${order.OrderTime}</p>
-                    <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone}">${order.CustomerPhone}</a></p>
-                    <p><strong>الإجمالي:</strong> ${order.TotalAmount} ريال</p>
-                    <p><strong>التفاصيل:</strong></p>
-                    <pre>${order.OrderDetails}</pre>
-                    ${!order.Delivered ? `<button class="complete-btn" data-row-id="${order.rowId}">✓ تم التسليم</button>` : ''}
-                `;
-                return card;
             }
         });
     </script>
