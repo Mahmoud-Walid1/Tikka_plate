@@ -1,56 +1,284 @@
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الطلبات - تكا بليت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        h1, h2 { text-align: center; color: #1E5637; }
+        #password-prompt { display: flex; justify-content: center; align-items: center; height: 80vh; }
+        #password-form { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        #password-input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-left: 10px; font-family: 'Tajawal'; }
+        #password-submit { padding: 10px 15px; background: #1E5637; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Tajawal';}
+        #dashboard-content { display: none; }
+        .tabs { text-align: center; margin-bottom: 20px; }
+        .tab-btn { background: #e0e0e0; border: none; padding: 10px 20px; cursor: pointer; font-size: 1rem; border-radius: 5px; margin: 0 5px; font-family: 'Tajawal'; }
+        .tab-btn.active { background: #1E5637; color: white; }
+        .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .order-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; border-right: 5px solid #C85A2B; transition: transform 0.2s; }
+        .order-card.completed { border-right-color: #28a745; }
+        .order-card:hover { transform: translateY(-5px); }
+        .order-card h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1rem; }
+        .order-card p { margin: 10px 0; }
+        .order-card pre { background: #f9f9f9; padding: 10px; border-radius: 4px; white-space: pre-wrap; font-family: 'Tajawal', sans-serif; line-height: 1.7; }
+        strong { color: #333; }
+        .complete-btn { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-family: 'Tajawal'; }
+        .complete-btn:disabled { background-color: #aaa; }
+        #archive-view { display: none; }
+    </style>
+</head>
+<body>
 
-module.exports = async (req, res) => {
-    // 1. التحقق من كلمة المرور (زي ما هو)
-    const providedPassword = req.headers.authorization;
-    const correctPassword = process.env.DASHBOARD_PASSWORD;
-     if (!providedPassword || providedPassword !== correctPassword) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+    <div id="password-prompt">
+        <div id="password-form">
+            <h2>لوحة التحكم محمية</h2>
+            <p>الرجاء إدخال كلمة المرور لعرض الطلبات</p>
+            <input type="password" id="password-input" placeholder="كلمة المرور">
+            <button type="button" id="password-submit">دخول</button>
+            <p id="password-error" style="color: red; display: none; margin-top: 10px;">فشل التحميل. تأكد من كلمة المرور والصلاحيات.</p>
+        </div>
+    </div>
 
-    try {
-        // <<< === بداية التعديل: هنستقبل رقم الفاتورة === >>>
-        const { invoiceId } = req.body;
-        if (!invoiceId) {
-            return res.status(400).json({ error: 'Invoice ID is missing.' });
-        }
-        // <<< === نهاية التعديل === >>>
+    <div id="dashboard-content">
+        <h1>📋 طلبات تكا بليت</h1>
 
-        // 2. الاتصال بجوجل شيت (زي ما هو)
-        const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-        const serviceAccountAuth = new JWT({ /* ... */ });
-        const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        
-        await doc.loadInfo(); 
-        const sheet = doc.sheetsByIndex[0]; 
-        await sheet.loadHeaderRow();
+        <div class="tabs">
+            <button class="tab-btn active" id="new-orders-tab">طلبات جديدة (<span id="new-orders-count">0</span>)</button>
+            <button class="tab-btn" id="archive-tab">الأرشيف (<span id="archive-count">0</span>)</button>
+        </div>
 
-        const rows = await sheet.getRows();
+        <div id="new-orders-view">
+            <div id="new-orders-grid" class="orders-grid"></div>
+        </div>
+        <div id="archive-view">
+            <div id="archive-grid" class="orders-grid"></div>
+        </div>
+    </div>
 
-        // <<< === بداية التعديل: هندور برقم الفاتورة === >>>
-        const rowToUpdate = rows.find(row => row.get('رقم الفاتورة') === invoiceId);
-        // <<< === نهاية التعديل === >>>
+    <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
 
-        if (rowToUpdate) {
-            rowToUpdate.set('تم التسليم', 'نعم');
-            await rowToUpdate.save();
-            res.status(200).json({ success: true });
-        } else {
-            console.warn(`Invoice ID ${invoiceId} not found in sheet.`); // رسالة أوضح للـ Logs
-            res.status(404).json({ error: 'Invoice ID not found.' });
-        }
-    } catch (error) {
-        console.error('Update Status Error:', error);
-        res.status(500).json({ error: 'Failed to update order status.', details: error.message });
-    }
-};
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const passwordPrompt = document.getElementById('password-prompt');
+            const passwordForm = document.getElementById('password-form');
+            const passwordError = document.getElementById('password-error');
+            const dashboardContent = document.getElementById('dashboard-content');
+            const passwordInput = document.getElementById('password-input');
+            const passwordSubmit = document.getElementById('password-submit');
+            const newOrdersTab = document.getElementById('new-orders-tab');
+            const archiveTab = document.getElementById('archive-tab');
+            const newOrdersView = document.getElementById('new-orders-view');
+            const archiveView = document.getElementById('archive-view');
+            const notificationSound = document.getElementById('notification-sound');
 
-// --- JWT setup ---
-const setupAuth = (creds) => {
- return new JWT({
-    email: creds.client_email,
-    key: creds.private_key,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
- });
-}
+            // --- State ---
+            let displayedOrderIds = new Set();
+            let sessionPassword = '';
+            let fetchInterval; // لتخزين مؤقت التحديث التلقائي
+
+            // --- Event Listeners ---
+            passwordSubmit.addEventListener('click', main);
+            passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
+            newOrdersTab.addEventListener('click', showNewOrdersView);
+            archiveTab.addEventListener('click', showArchiveView);
+            dashboardContent.addEventListener('click', handleCompleteButtonClick);
+
+            // --- Functions ---
+            function showNewOrdersView() {
+                newOrdersView.style.display = 'block';
+                archiveView.style.display = 'none';
+                newOrdersTab.classList.add('active');
+                archiveTab.classList.remove('active');
+            }
+
+            function showArchiveView() {
+                newOrdersView.style.display = 'none';
+                archiveView.style.display = 'block';
+                newOrdersTab.classList.remove('active');
+                archiveTab.classList.add('active');
+            }
+
+            async function handleCompleteButtonClick(event) {
+                if (!event.target.classList.contains('complete-btn')) return;
+
+                const button = event.target;
+                const invoiceId = button.dataset.invoiceId;
+                console.log("Button clicked, trying to get invoiceId:", invoiceId);
+
+                if (!invoiceId) {
+                    console.error("data-invoice-id attribute is missing or empty.");
+                    alert('خطأ: لم يتم العثور على رقم فاتورة الطلب. حاول تحديث الصفحة.');
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = 'جاري الحفظ...';
+
+                const success = await markOrderAsCompleted(invoiceId);
+                if (!success) {
+                    alert('فشل تحديث حالة الطلب. تحقق من Logs السيرفر.');
+                    button.disabled = false;
+                    button.textContent = '✓ تم التسليم';
+                } else {
+                    // نحدث فورًا بدل انتظار التحديث التلقائي
+                    await fetchAndRenderOrders(sessionPassword);
+                }
+            }
+
+            async function main() {
+                const password = passwordInput.value;
+                if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
+
+                sessionPassword = password;
+                passwordForm.innerHTML = '<p>جاري التحقق والتحميل...</p>';
+                passwordError.style.display = 'none'; // إخفاء رسالة الخطأ القديمة
+
+                const result = await fetchAndRenderOrders(sessionPassword);
+
+                if (result.success) {
+                    passwordPrompt.style.display = 'none';
+                    dashboardContent.style.display = 'block';
+
+                    // Populate initial order IDs
+                    result.orders.forEach(order => { if (!order.Delivered) displayedOrderIds.add(order.rowId); }); // Assuming rowId is still sent by get-orders for bell logic
+
+                    // Clear previous interval if exists
+                    if (fetchInterval) clearInterval(fetchInterval);
+                    // Set new interval
+                    fetchInterval = setInterval(() => fetchAndRenderOrders(sessionPassword), 30000);
+                } else {
+                     passwordForm.innerHTML = `
+                        <h2>لوحة التحكم محمية</h2>
+                        <p>الرجاء إدخال كلمة المرور لعرض الطلبات</p>
+                        <input type="password" id="password-input" placeholder="كلمة المرور">
+                        <button type="button" id="password-submit">دخول</button>
+                     `;
+                     // إعادة ربط الأحداث بعد إعادة إنشاء العناصر
+                     document.getElementById('password-submit').addEventListener('click', main);
+                     document.getElementById('password-input').addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
+
+                     passwordError.textContent = `فشل تحميل البيانات. السبب: ${result.error}`;
+                     passwordError.style.display = 'block';
+                }
+            }
+
+            async function fetchAndRenderOrders(password) {
+                try {
+                    const response = await fetch('/api/get-orders', { headers: { 'Authorization': password } });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        // Handle specific unauthorized error
+                        if (response.status === 401) {
+                             throw new Error('كلمة المرور غير صحيحة.');
+                        }
+                        throw new Error(errorData.details || `Server error: ${response.status}`);
+                    }
+
+                    const orders = await response.json();
+                    console.log("Orders received:", orders ? orders.length : 0);
+
+                    const newOrdersGrid = document.getElementById('new-orders-grid');
+                    const archiveGrid = document.getElementById('archive-grid');
+                    newOrdersGrid.innerHTML = ''; // Clear previous orders
+                    archiveGrid.innerHTML = ''; // Clear previous orders
+
+                    let newOrdersCount = 0;
+                    let archiveCount = 0;
+                    let newOrderFound = false;
+
+                    if (!Array.isArray(orders)) {
+                        throw new Error("Invalid data received from server.");
+                    }
+
+                    for(const order of orders) {
+                        // Skip if order data is incomplete (e.g., missing essential fields)
+                        if (!order || !order.InvoiceID) continue;
+
+                        const card = createOrderCard(order);
+                        if (!order.Delivered) {
+                            newOrdersGrid.appendChild(card);
+                            newOrdersCount++;
+                            // Check if rowId exists before using it for the bell
+                            if (order.rowId !== undefined && order.rowId !== null && !displayedOrderIds.has(order.rowId)) {
+                                newOrderFound = true;
+                                displayedOrderIds.add(order.rowId);
+                            }
+                        } else {
+                            archiveGrid.appendChild(card);
+                            archiveCount++;
+                        }
+                    }
+
+                    document.getElementById('new-orders-count').textContent = newOrdersCount;
+                    document.getElementById('archive-count').textContent = archiveCount;
+
+                    if (newOrdersCount === 0) newOrdersGrid.innerHTML = '<h2>لا توجد طلبات جديدة حاليًا...</h2>';
+                    if (archiveCount === 0) archiveGrid.innerHTML = '<h2>الأرشيف فارغ...</h2>';
+
+                    if (newOrderFound && document.hidden === false) {
+                         notificationSound.play().catch(e => { console.warn("Audio play failed:", e)});
+                    }
+
+                    return { success: true, orders: orders };
+                } catch (error) {
+                    console.error('Failed to fetch orders:', error);
+                    return { success: false, error: error.message }; // Return error message
+                }
+            }
+
+            async function markOrderAsCompleted(invoiceId) {
+                try {
+                    console.log("Sending invoiceId to server:", invoiceId);
+                    const response = await fetch('/api/update-order-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': sessionPassword
+                        },
+                        body: JSON.stringify({ invoiceId: invoiceId }) // Use invoiceId
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Server error on update:", errorData);
+                    }
+                    return response.ok;
+                } catch (error) {
+                    console.error("Network error on update:", error);
+                    return false;
+                }
+            }
+
+            function createOrderCard(order) {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                if(order.Delivered) card.classList.add('completed');
+
+                // Use InvoiceID for the button data attribute
+                const invoiceIdAttr = (order.InvoiceID && order.InvoiceID !== 'N/A')
+                                    ? `data-invoice-id="${order.InvoiceID}"`
+                                    : '';
+
+                const completeButtonHTML = !order.Delivered && invoiceIdAttr
+                    ? `<button class="complete-btn" ${invoiceIdAttr}>✓ تم التسليم</button>`
+                    : (order.Delivered ? '<p style="color: green; font-weight: bold;">تم التسليم</p>' : '');
+
+                card.innerHTML = `
+                    <h3>فاتورة: ${order.InvoiceID || 'N/A'}</h3>
+                    <p><strong>وقت الطلب:</strong> ${order.OrderTime || 'N/A'}</p>
+                    <p><strong>جوال العميل:</strong> <a href="tel:${order.CustomerPhone || ''}">${order.CustomerPhone || 'N/A'}</a></p>
+                    <p><strong>الإجمالي:</strong> ${order.TotalAmount || '0'} ريال</p>
+                    <p><strong>التفاصيل:</strong></p>
+                    <pre>${order.OrderDetails || 'N/A'}</pre>
+                    ${completeButtonHTML}
+                `;
+                return card;
+            }
+
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
