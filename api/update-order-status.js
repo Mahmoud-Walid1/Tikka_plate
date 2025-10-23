@@ -26,14 +26,14 @@ module.exports = async (req, res) => {
         
         await doc.loadInfo(); 
         const sheet = doc.sheetsByIndex[0]; 
-        await sheet.loadHeaderRow();
+        await sheet.loadHeaderRow(); // نتأكد من تحميل الأعمدة
 
         const rows = await sheet.getRows();
 
-        // 3. البحث عن الصف وتحديثه
+        // 3. البحث عن الصف وتحديثه بكلمة "نعم"
         const rowToUpdate = rows.find(row => row.offset === rowId);
         if (rowToUpdate) {
-            rowToUpdate.set('تم التسليم', 'نعم');
+            rowToUpdate.set('تم التسليم', 'نعم'); // الكتابة هنا
             await rowToUpdate.save();
             res.status(200).json({ success: true });
         } else {
@@ -41,6 +41,6 @@ module.exports = async (req, res) => {
         }
     } catch (error) {
         console.error('Update Status Error:', error);
-        res.status(500).json({ error: 'Failed to update order status.' });
+        res.status(500).json({ error: 'Failed to update order status.', details: error.message });
     }
 };
