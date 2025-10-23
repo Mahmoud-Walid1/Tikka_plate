@@ -81,51 +81,42 @@
             passwordInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') main(); });
             newOrdersTab.addEventListener('click', showNewOrdersView);
             archiveTab.addEventListener('click', showArchiveView);
-            // <<< === بداية التعديل: استخدام Event Delegation === >>>
-            dashboardContent.addEventListener('click', handleCompleteButtonClick);
-            // <<< === نهاية التعديل === >>>
+            dashboardContent.addEventListener('click', handleCompleteButtonClick); // Event delegation
 
             // --- Functions ---
-            function showNewOrdersView() {
-                newOrdersView.style.display = 'block';
-                archiveView.style.display = 'none';
-                newOrdersTab.classList.add('active');
-                archiveTab.classList.remove('active');
-            }
-
-            function showArchiveView() {
-                newOrdersView.style.display = 'none';
-                archiveView.style.display = 'block';
-                newOrdersTab.classList.remove('active');
-                archiveTab.classList.add('active');
-            }
+            function showNewOrdersView() { /* ... (لا تغيير هنا) ... */ }
+            function showArchiveView() { /* ... (لا تغيير هنا) ... */ }
 
             async function handleCompleteButtonClick(event) {
-                // التأكد من أن الضغطة كانت على الزر الصحيح
                 if (!event.target.classList.contains('complete-btn')) return;
 
                 const button = event.target;
-                // <<< === بداية التعديل: التأكد من قراءة وتحويل الرقم === >>>
-                const rowIdString = button.dataset.rowId;
-                console.log("Button clicked for rowId string:", rowIdString); // نطبع الرقم كنص
+                const rowIdString = button.dataset.rowId; // نقرأ الرقم المخزن في الزرار
+                console.log("Button clicked, trying to get rowId:", rowIdString); // نطبع للتأكد
 
-                // تحويل النص لرقم والتأكد إنه رقم صحيح
-                const rowIdInt = parseInt(rowIdString, 10);
-                if (isNaN(rowIdInt)) {
-                    console.error("Failed to parse rowId:", rowIdString);
-                    alert('خطأ: لم يتم العثور على رقم الطلب. حاول تحديث الصفحة.');
+                // <<< === بداية التعديل: نتأكد إن الرقم موجود وصالح === >>>
+                if (rowIdString === undefined || rowIdString === null || rowIdString === '') {
+                    console.error("data-row-id attribute is missing or empty on the button.");
+                    alert('خطأ: لم يتم العثور على رقم تعريف الطلب في الزر. حاول تحديث الصفحة.');
                     return;
                 }
-                console.log("Parsed rowId integer:", rowIdInt); // نطبع الرقم الصحيح
                 // <<< === نهاية التعديل === >>>
+
+                const rowIdInt = parseInt(rowIdString, 10);
+                if (isNaN(rowIdInt)) {
+                    console.error("Failed to parse rowId string:", rowIdString);
+                    alert('خطأ: رقم تعريف الطلب غير صالح. حاول تحديث الصفحة.');
+                    return;
+                }
+                console.log("Parsed rowId integer:", rowIdInt);
 
                 button.disabled = true;
                 button.textContent = 'جاري الحفظ...';
 
-                const success = await markOrderAsCompleted(rowIdInt); // نبعت الرقم الصحيح
+                const success = await markOrderAsCompleted(rowIdInt);
                 if (!success) {
-                    alert('فشل تحديث حالة الطلب. تحقق من Logs السيرفر.'); // رسالة خطأ أوضح
-                    button.disabled = false;
+                    alert('فشل تحديث حالة الطلب. تحقق من Logs السيرفر.');
+                    button.disabled = false; // نرجع الزرار لو فشل
                     button.textContent = '✓ تم التسليم';
                 } else {
                     await fetchAndRenderOrders(sessionPassword); // نحدث القائمة فورًا
@@ -136,34 +127,22 @@
 
             async function fetchAndRenderOrders(password) { /* ... (لا تغيير هنا) ... */ }
 
-            async function markOrderAsCompleted(rowIdInt) {
-                try {
-                    console.log("Sending rowId to server:", rowIdInt); // نتأكد من الرقم قبل الإرسال
-                    const response = await fetch('/api/update-order-status', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': sessionPassword
-                        },
-                        body: JSON.stringify({ rowId: rowIdInt }) // نبعت الرقم الصحيح
-                    });
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error("Server error on update:", errorData);
-                    }
-                    return response.ok;
-                } catch (error) {
-                    console.error("Network error on update:", error);
-                    return false;
-                }
-            }
+            async function markOrderAsCompleted(rowIdInt) { /* ... (لا تغيير هنا) ... */ }
 
-            function createOrderCard(order) { /* ... (لا تغيير هنا) ... */ }
-             // --- الكود الخاص بإنشاء كارتة الطلب ---
-             function createOrderCard(order) {
+            // <<< === بداية التعديل: نتأكد إن رقم الصف بيتخزن صح في الزرار === >>>
+            function createOrderCard(order) {
                 const card = document.createElement('div');
                 card.className = 'order-card';
                 if(order.Delivered) card.classList.add('completed');
+
+                // نتأكد إن رقم الصف موجود وصالح قبل ما نضيفه للزرار
+                const rowIdAttr = (order.rowId !== undefined && order.rowId !== null)
+                                ? `data-row-id="${order.rowId}"`
+                                : ''; // لو مش موجود، مش هنضيف الخاصية دي أصلًا
+
+                const completeButtonHTML = !order.Delivered && rowIdAttr // نضيف الزرار فقط لو الطلب جديد والرقم موجود
+                    ? `<button class="complete-btn" ${rowIdAttr}>✓ تم التسليم</button>`
+                    : '<p style="color: green; font-weight: bold;">تم التسليم</p>';
 
                 card.innerHTML = `
                     <h3>فاتورة: ${order.InvoiceID}</h3>
@@ -172,13 +151,27 @@
                     <p><strong>الإجمالي:</strong> ${order.TotalAmount} ريال</p>
                     <p><strong>التفاصيل:</strong></p>
                     <pre>${order.OrderDetails}</pre>
-                    ${!order.Delivered ? `<button class="complete-btn" data-row-id="${order.rowId}">✓ تم التسليم</button>` : '<p style="color: green; font-weight: bold;">تم التسليم</p>'}
+                    ${completeButtonHTML}
                 `;
                 return card;
             }
-            // --- الكود الخاص بجلب وعرض الطلبات ---
+            // <<< === نهاية التعديل === >>>
+
+             // --- الدوال المساعدة الأخرى (نسخ ولصق بدون تغيير) ---
+             function showNewOrdersView() {
+                newOrdersView.style.display = 'block';
+                archiveView.style.display = 'none';
+                newOrdersTab.classList.add('active');
+                archiveTab.classList.remove('active');
+            }
+            function showArchiveView() {
+                newOrdersView.style.display = 'none';
+                archiveView.style.display = 'block';
+                newOrdersTab.classList.remove('active');
+                archiveTab.classList.add('active');
+            }
             async function fetchAndRenderOrders(password) {
-                try {
+                 try {
                     const response = await fetch('/api/get-orders', { headers: { 'Authorization': password } });
 
                     if (!response.ok) {
@@ -198,7 +191,7 @@
                     let newOrderFound = false;
 
                     for(const order of orders) {
-                        const card = createOrderCard(order);
+                        const card = createOrderCard(order); // استخدام الدالة المحدثة
                         if (!order.Delivered) {
                             newOrdersGrid.appendChild(card);
                             newOrdersCount++;
@@ -228,8 +221,28 @@
                     return { success: false, error: error.message };
                 }
             }
-             // --- الكود الخاص بالدخول الرئيسي ---
-            async function main() {
+             async function markOrderAsCompleted(rowIdInt) {
+                try {
+                    console.log("Sending rowId to server:", rowIdInt);
+                    const response = await fetch('/api/update-order-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': sessionPassword
+                        },
+                        body: JSON.stringify({ rowId: rowIdInt })
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Server error on update:", errorData);
+                    }
+                    return response.ok;
+                } catch (error) {
+                    console.error("Network error on update:", error);
+                    return false;
+                }
+            }
+             async function main() {
                 const password = passwordInput.value;
                 if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
 
@@ -248,7 +261,8 @@
                      passwordForm.innerHTML = `<p style="color: red;">فشل تحميل البيانات. السبب: ${result.error}</p><p>تأكد من الصلاحيات وأسماء الأعمدة في جوجل شيت.</p>`;
                 }
             }
-        });
+
+        }); // نهاية الـ DOMContentLoaded
     </script>
 </body>
 </html>
